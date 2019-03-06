@@ -1,0 +1,15 @@
+{
+ "manifest_version": 2,
+ "name": "Cat Page",
+ "description": "Cats in your new tab",
+ "version": "1",
+ "author": "Tara Dia",
+"browser_action": {
+   "default_icon": "tab-icon.png",
+   "default_title": "Cat time!"
+ },
+"chrome_url_overrides" : {
+  "newtab": "newtab.html"
+},
+ "permissions": ["activeTab"]
+}
