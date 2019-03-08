@@ -1,16 +1,11 @@
-chrome.identity.getProfileUserInfo(function(userInfo) {
-  console.log(JSON.stringify(userInfo));
-});
-
-
-
-
-
 $(document).ready(function() {
   //// TODO: add users so their favorites are what's shown OR make it so most popular cats are what's shown if I can't get unique IDs for my users
   // TODO: make it possible to delete favorites
-  var currentImageID;
   getRandomCat();
+
+    // chrome.identity.getProfileUserInfo(function(userInfo) {
+    //   var userID = JSON.stringify(userInfo["email"]);
+    // });
 
   $("#addToFavoritesButton").click(function() {
     //TODO: put in a way to only add ones that haven't been added already
