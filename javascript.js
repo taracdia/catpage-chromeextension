@@ -1,105 +1,114 @@
 $(document).ready(function() {
   //sub_id is userID
-  // TODO: make it possible to delete favorites
-  //TODO: handle users who are not logged in to a google account: userID is empty string
+  //TODO: check if this worked: handle users who are not logged in to a google account: userID is empty string. Remove/ disable addToFavoritesButton and getFavoritesButton
+  //// TODO: handle blocking extra clicks so they don't favorite/delete the wrong picture
   getRandomCat();
   var userID;
   chrome.identity.getProfileUserInfo(function(userInfo) {
     userID = JSON.stringify(userInfo["id"]);
     userID = userID.replace(/"/g, "");
+    if (userID === "") {
+      $("#addToFavoritesButton").attr("disabled", true);
+      $("#getFavoritesButton").attr("disabled", true);
+    }
   });
 
-  function getRandomCat() {
-    $.ajax({
-      url: "https://api.thecatapi.com/v1/images/search",
-      type: "GET",
-      success: function(result) {
-        $("#currentImage").attr("src", result[0]["url"]);
-        currentImageID = result[0]["id"];
-        console.log(currentImageID);
-      }
-    })
-  }
-
-  $("#newCatButton").click(function() {
-    //TODO: show main picture and get favorites button and add to favorites button
-    document.getElementById("favesList").innerHTML = "";
-    getRandomCat();
-  });
-
-  $("#addToFavoritesButton").click(function() {
-    //TODO: put in a way to only add ones that haven't been added already
-    //TODO: tell them that it's been added or that it was already in there
-    console.log(userID);
-    var settings = {
+  //workaround to avoid code duplication and having to make a deep copy of an object
+  function getSettings() {
+    return {
       "async": true,
       "crossDomain": true,
-      "url": "https://api.thecatapi.com/v1/favourites",
-      "method": "POST",
       "headers": {
         "content-type": "application/json",
         "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
       },
       "processData": false,
-      "data": "{\"image_id\":\"" + currentImageID + "\",\"sub_id\":\"" + userID + "\"}"
     }
-    console.log(settings);
+  }
+
+  function getRandomCat() {
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/images/search";
+    settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
-      console.log(response);
-      //TODO: get a new cat IF RESPONSE MEANS SUCCESSFUL
-      //getRandomCat();
+      var firstResponse = response[0];
+      $("#currentCat").attr("src", firstResponse["url"]);
+      $("#currentCat").attr("alt", firstResponse["id"]);
     });
+  }
 
+  $("#newCatButton").click(function() {
+    getRandomCat();
+    $("#currentCat").show();
+    $("#addToFavoritesButton").show();
+    $("#getFavoritesButton").show();
+    document.getElementById("favesList").innerHTML = "";
+  });
+
+  $("#addToFavoritesButton").click(function() {
+    var currentImageID = $("#currentCat").attr("alt");
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/favourites";
+    settings.method = "POST";
+    settings.data = "{\"image_id\":\"" + currentImageID + "\",\"sub_id\":\"" + userID + "\"}";
+
+    $.ajax(settings)
+      .done(function(response) {
+        //TODO: tell them that it's been added
+        getRandomCat();
+      })
+      .fail(function(xhr, ajaxOptions, thrownError) {
+        var error = JSON.parse(xhr.responseText);
+        if (error.message.includes("DUPLICATE_FAVOURITE")) {
+          //TODO: tell them that it's already in there
+          console.log("duplicate");
+        }
+      });
   });
 
   $("#getFavoritesButton").click(function() {
     // TODO: shuffle the favorites`
-    //TODO: hide main picture and get favorites button and add to favorites button
-    var settings = {
-      "async": true,
-      "crossDomain": true,
-      "url": "https://api.thecatapi.com/v1/favourites?sub_id=" + userID,
-      "method": "GET",
-      "headers": {
-        "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
-      }
-    }
-    console.log(settings);
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/favourites?sub_id=" + userID;
+    settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
-      console.log(response);
       var favesList = document.getElementById("favesList");
       favesList.innerHTML = "";
+      //set this so that it only works if there are favorites to show and the response was SUCCESSFUL
+      $("#currentCat").hide();
+      $("#addToFavoritesButton").hide();
+      $("#getFavoritesButton").hide();
       for (i = 0; i < response.length; i++) {
+        var faveResponse = response[i];
 
         var div = document.createElement("DIV");
         div.classList.add("faveCard");
-        var img = document.createElement("IMG");
-        img.src = response[i]["image"]["url"];
-        img.id = response[i]["image_id"];
+        div.id = faveResponse["id"];
         favesList.appendChild(div);
+
+        var btn = document.createElement("BUTTON");
+        btn.classList.add("deleteButton");
+        btn.innerHTML = "x";
+        div.appendChild(btn);
+
+        var img = document.createElement("IMG");
+        img.src = faveResponse["image"]["url"];
+        img.id = faveResponse["image_id"];
         div.appendChild(img);
-        div.id = response[i]["id"];
 
       }
-      $(".faveCard").click(function() {
-        var faveID = this.id;
-        var settings = {
-          "async": true,
-          "crossDomain": true,
-          "url": "https://api.thecatapi.com/v1/favourites/" + faveID,
-          "method": "DELETE",
-          "headers": {
-            "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
-          }
-        }
-
-        $.ajax(settings).done(function(response) {
-          console.log(response);
-          //// TODO: after delete, refresh list of faves
+      $(".deleteButton").click(function() {
+        var parentElement = $(this).parent();
+        parentElement.hide();
+        var deleteSettings = getSettings();
+        deleteSettings.url = "https://api.thecatapi.com/v1/favourites/" + parentElement.attr("id");
+        deleteSettings.method = "DELETE";
+        $.ajax(deleteSettings).done(function(response) {
+          
         });
-      })
+      });
     });
   });
 
