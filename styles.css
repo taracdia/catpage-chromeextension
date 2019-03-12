@@ -16,5 +16,6 @@
 }
 
 .deleteButton {
-  display: none;
+  position: absolute;
+  right: 10px;
 }

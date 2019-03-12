@@ -38,6 +38,8 @@ $(document).ready(function() {
     });
   }
 
+  function zoomInOnFave(faveID)
+
   $("#newCatButton").click(function() {
     getRandomCat();
     $("#currentCat").show();
@@ -99,6 +101,17 @@ $(document).ready(function() {
         div.appendChild(img);
 
       }
+
+      $(".deleteButton").hide();
+
+      $(".faveCard").mouseover(function(){
+        $(this).children(".deleteButton").show();
+      });
+
+      $(".faveCard").mouseout(function(){
+        $(this).children(".deleteButton").hide();
+      });
+
       $(".deleteButton").click(function() {
         var parentElement = $(this).parent();
         parentElement.hide();
@@ -106,7 +119,7 @@ $(document).ready(function() {
         deleteSettings.url = "https://api.thecatapi.com/v1/favourites/" + parentElement.attr("id");
         deleteSettings.method = "DELETE";
         $.ajax(deleteSettings).done(function(response) {
-          
+          // TODO: inform them of the deletion
         });
       });
     });
