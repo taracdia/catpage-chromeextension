@@ -9,14 +9,18 @@
 
 <body>
   <p id="buttonBar">
-    <button id="getFavoritesButton">Get Faves</button>
-    <button id="addToFavoritesButton">Add to Faves</button>
-    <button id="newCatButton">Get New Cat</button>
+    <input type="radio" name="numberMode" value="one">One cat
+    <input type="radio" name="numberMode" value="many">Multiple cats
+    <input type="number" name="catsNumber" min="1" max="100" placeholder="Cat #" id="catsNumberInput">
+    <button id="getFavesButton">Get Fave(s)</button>
+    <button id="newCatButton">Get New Cat(s)</button>
+
+    <input type="range" min="20" max="1000" value="200" class="slider" id="imageSizeSlider">Image size
   </p>
-  <div id="currentCatDiv">
-    <img id="currentCat">
+  <div id="singleCatDiv" class="catImageDiv">
+    <img id="singleCat">
   </div>
-  <div id="favesList"></div>
+  <div id="multipleCatsDiv"></div>
 </body>
 <script src="javascript.js"></script>
 

@@ -9,13 +9,15 @@
     max-height: 100%;
 }
 
-#currentCat {
-  /*TODO: make this scale dynamically*/
+.catImageDiv {
   height: 200px;
   width: 200px;
+  border-style: solid
+}
+#singleCatDiv{
+  border-color: red;
 }
 
 .deleteButton {
   position: absolute;
-  right: 10px;
 }

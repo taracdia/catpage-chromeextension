@@ -16,6 +16,7 @@
   "permissions": [
     "activeTab",
     "identity",
-    "identity.email"
+    "identity.email",
+    "storage"
   ]
 }
