@@ -1,79 +1,141 @@
 $(document).ready(function() {
+  var isOnFave = false;
+  var userID;
   //sub_id is userID
   // TODO: handle blocking extra clicks so they don't favorite/delete the wrong picture
-  // TODO: get local storage so that their choice of which mode to start in is saved
   //TODO: handle email-less users: disable addToFavoritesButton, getFavesButton, radio "mode"
   // TODO: handle situation where they have no faves yet
+  // TODO: handle isOnFave being true and then immediately calling getFaves because the user id wouldn't be set yet
 
-var multDiv = $("#multipleCatsDiv");
+
 
 for (var i = 0; i < 10; i++){
-  multDiv.append($("<div class=\"catImageDiv\"></div>"));
+  $("#multipleCatsDiv").append($("<div class=\"catImageDiv\"></div>"));
 }
 
 /*
-  local storage on open:
+// TODO: figure out how to handle empty catsNumberInput
+
+userID has three modes: unset, empty, and set
+  unset: undefined. only happens on first opening of page. Afterwards, a function asks the browser what the userID is. If the user is not signed in, userID is set to an empty string. Otherwise UserID is set to a unique UserID.
+  empty: empty string. Means user is not logged in to Chrome
+  set: the user's ID
+
+local storage on open:
   multipleBoolean:
     if true: multiMode();
     if false: singleMode();
+    if not set: singleMode();
   faveBoolean:
-    if true: getFaveCats();
-    if false: getRandomCats();
-  numberOfCats: apply to number input
+    if true: getFaveOnClick;
+    if false: getRandOnClick;
+    if not set: getRandOnClick;
+  numberOfCats: apply to number input or leave blank if not set or set to 0
   imageSize: apply to imageSizeSlider
+  userID:
+    if one is saved, set it to userID global variable
+    else: run the function that gets the userID and set it to userID
 
-  local storage on close:
+local storage on close:
   multipleBoolean:
     true if: numberMode is "many"
     else false
   faveBoolean:
-    if true: getFaveCats();
-    if false: getRandomCats();
-  numberOfCats: apply to number input, default 10 if not there
+    set as isOnFave
+  numberOfCats: apply to number input, default 0 if not there
   imageSize: from imageSizeSlider
+  userID: save userID
 
 
 radio listener:
   when changed, run singleMode() or run multiMode()
 
 slider listener:
-  when changed, run singleMode() or run multiMode()
-
-get local storage's most recent setting and apply it to the sliders and the radio buttons and the number input
-put listeners on each of them so that when they change, the new info is saved in local storage ?? or only when tab closed?
+  when changed, changeImageSize()
 
 function singleMode(){
-howManyCatsSlider disabled
-sizeSlider disabled
-make sure radio "number" is "one"
-show singleCatDiv
-hide multipleCatsDiv
-hide catsNumberInput
+  howManyCatsSlider hide
+  sizeSlider hide
+  make sure radio "number" is "one" and not "many"
+  show singleCatDiv
+  hide multipleCatsDiv
+  hide catsNumberInput
 }
 
 function multiMode(){
-howManyCatsSlider enabled
-sizeSlider enabled
-make sure radio "number" is "many"
-hide singleCatDiv
-show multipleCatsDiv
-show catsNumberInput
+  howManyCatsSlider show
+  sizeSlider show
+  make sure radio "number" is "many" and not "one"
+  hide singleCatDiv
+  show multipleCatsDiv
+  show catsNumberInput
 }
 
-function getRandomCats(numberOfCats){
-  //(need to update get parameters to include limit: numberOfCats from catsNumberInput)
+getFaveOnClick:
+  isOnFave = true;
+  setDivs();
+
+getRandOnClick:
+  isOnFave = false;
+  setDivs();
+
+function doRandomCats(){
+  getRandomCats(getCatLimit());
+}
+
+function setDivs(){
+
+}
+
+function getRandomCats(catLimit){
+  //(need to update get parameters to include catLimit)
+
   //don't include ones that are in favorites
-  just return responses
 }
 
-function getFaveCats(numberOfCats){
+function getARandomCAt(){
+//figure this out w/o code duplication
+}
+
+function replaceFavesInRandom(){
+  getFaveIds;
+
+
+}
+
+function getCatLimit(){
+if on multipleCatsMode:
+  if there is no number in catsNumberInput:
+    return 10;
+  else:
+    return catsNumberInput number
+else:
+  return 1;
+
+}
+
+function getFaveCats(){
+isOnFave = true;
 //(need to update get parameters to include limit: numberOfCats from catsNumberInput)
-just return responses
+
+}
+
+function getFaveCatIDs(){
 
 }
 
 function responsesToImages(responses){
-take responses and apply them either to singleCatDiv or multipleCatsDiv
+  take responses and apply them either to singleCatDiv or multipleCatsDiv depending on radio button
+
+  if multiple:
+    create the number of divs from catsNumber input
+    add class imageCard to each
+    changeImageSize()
+}
+
+function changeImageSize(){
+  var dimensions = get slider value
+  change css of imageCard class to height = dimensions, width = dimensions
 }
 */
 
