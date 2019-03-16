@@ -14,8 +14,6 @@ for (var i = 0; i < 10; i++){
 }
 
 /*
-// TODO: figure out how to handle empty catsNumberInput
-
 userID has three modes: unset, empty, and set
   unset: undefined. only happens on first opening of page. Afterwards, a function asks the browser what the userID is. If the user is not signed in, userID is set to an empty string. Otherwise UserID is set to a unique UserID.
   empty: empty string. Means user is not logged in to Chrome
@@ -73,64 +71,80 @@ function multiMode(){
 
 getFaveOnClick:
   isOnFave = true;
-  setDivs();
+  setDivs(shuffleArray(getFaveCats(getCatLimit())));
 
 getRandOnClick:
   isOnFave = false;
-  setDivs();
+  setDivs(getRandomCats(getCatLimit()));
 
-function doRandomCats(){
-  getRandomCats(getCatLimit());
+function setDivs(array){
+  singleCatDiv.innerHTML = ""
+  multipleCatsDiv.innerHTML = ""
+  createResponsiveDiv(singleCatDiv, array[0]);
+
+  for (var i = 0; i < array.length; i++){
+    create div
+    createResponsiveDiv(div, array[i]);
+    add div to multipleCatsDiv
+    add class="catImageDiv" to div
+  }
 }
 
-function setDivs(){
-
+function createResponsiveDiv(div, cat){
+  add button to div
+  add img to div
+  img add src as cat["url"];
+  img add id as cat["id"];
+  if cat["fave_id"] exists:
+    set it to img's alt
+    button is delete type**
+  else:
+    set img's alt to empty string
+    button is addFaves type**
 }
 
 function getRandomCats(catLimit){
-  //(need to update get parameters to include catLimit)
-
-  //don't include ones that are in favorites
+  var catsArray = [];
+  {
+    //pass sub_id IF it is set
+    get a random cat
+    if it has include_favourite = 1:
+      skip
+    else:
+      add it to catsArray
+  } do while catsArray.length < catLimit
+  return catsArray;
 }
 
-function getARandomCAt(){
-//figure this out w/o code duplication
+function getFaveCats(catLimit){
+  var outputArray = [];
+  var inputArray = getFaveArray(catLimit);
+  for each cat in inputArray:{
+    make object;
+    object["fave_id"] = cat["id"];
+    object["id"] = cat["image"]["id"];
+    object["url"] = cat["image"]["url"];
+
+    add object to outputArray
+  }
+  return outputArray;
 }
 
-function replaceFavesInRandom(){
-  getFaveIds;
+function shuffleArray(array){
+  return shuffledArray;
+}
 
-
+function getFaveArray(catLimit){
+  //need to put in limit parameter
+  //API
+  return faveArray
 }
 
 function getCatLimit(){
-if on multipleCatsMode:
   if there is no number in catsNumberInput:
     return 10;
   else:
     return catsNumberInput number
-else:
-  return 1;
-
-}
-
-function getFaveCats(){
-isOnFave = true;
-//(need to update get parameters to include limit: numberOfCats from catsNumberInput)
-
-}
-
-function getFaveCatIDs(){
-
-}
-
-function responsesToImages(responses){
-  take responses and apply them either to singleCatDiv or multipleCatsDiv depending on radio button
-
-  if multiple:
-    create the number of divs from catsNumber input
-    add class imageCard to each
-    changeImageSize()
 }
 
 function changeImageSize(){
