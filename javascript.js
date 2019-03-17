@@ -13,7 +13,7 @@ $(document).ready(function() {
   */
 
 for (var i = 0; i < 10; i++){
-  $("#multipleCatsDiv").append($("<div class=\"catImageDiv\"></div>"));
+  $("#multipleCatsDiv").append($("<div class=\"imageCard\"></div>"));
 }
 
 //-----Set up with local storage-----
@@ -131,7 +131,7 @@ function setDivs(array){
 //     create div
 //     createResponsiveDiv(div, array[i]);
 //     add div to multipleCatsDiv
-//     add class="catImageDiv" to div
+//     add class="imageCard" to div
 //   }
 }
 
@@ -198,19 +198,22 @@ function getFaveArray(catLimit){
 function getCatLimit(){
   console.log("getCatLimit")
 
+    var catNumber = 10;
 
-    //var catNumber = 10;
-//   if there is a number in catsNumberInput{
-//     catnumber = catsNumberInput number;}
-  //save catNumber in local storage
-  //return catNumber;
+    if($("#catsNumberInput").val() > 0){
+      catNumber = $("#catsNumberInput").val();
+    }
+
+    localStorage.numberOfCats = catNumber;
+  return catNumber;
 }
 
 function changeImageSize(){
   console.log("changeImageSize")
 
-//   var dimensions = get slider value
-//   change css of imageCard class to height = dimensions, width = dimensions
+  var dimensions = $("#imageSizeSlider").val();
+  $(".imageCard").height(dimensions);
+  $(".imageCard").width(dimensions);
 }
 
 
