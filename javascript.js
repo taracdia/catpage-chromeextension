@@ -1,15 +1,13 @@
 $(document).ready(function() {
-  var isOnFave = false;
-  var userID;
-  //sub_id is userID
   // TODO: handle blocking extra clicks so they don't favorite/delete the wrong picture
-  //TODO: handle email-less users: disable addToFavoritesButton, getFavesButton, radio "mode"
   // TODO: handle situation where they have no faves yet
-  // TODO: handle isOnFave being true and then immediately calling getFaves because the user id wouldn't be set yet
+  // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
 
   /*
+  sub_id in API is userID in local storage
+
   userID has three modes: unset, empty, and set
-    unset: undefined. only happens on first opening of page. Afterwards, a function asks the browser what the userID is. If the user is not signed in, userID is set to an empty string. Otherwise UserID is set to a unique UserID.
+    unset: undefined. Means that the user has not used the extension while signed in to chrome
     empty: empty string. Means user is not logged in to Chrome
     set: the user's ID
   */
@@ -22,12 +20,12 @@ for (var i = 0; i < 10; i++){
   if (typeof localStorage.userID !== "undefined"){
     //run the function to check for ID from browser
     //if it's empty:
-      //disable the things that get disabled when they don't have a UserID
+        //TODO: handle email-less users: disable addToFavoritesButton, getFavesButton, radio "mode"
     //else:
       //save the ID to userID in localStorage
   }
 
-  if(localStorage.multipleBoolean){
+  if(localStorage.multipleBoolean && localStorage.multipleBoolean === "true"){
     multiMode();
   } else {
     singleMode();
@@ -41,31 +39,39 @@ if(localStorage.imageSize){
   $("#imageSizeSlider").val(localStorage.imageSize);
 }
 
-if(localStorage.faveBoolean){
+if(localStorage.faveBoolean && localStorage.faveBoolean === "true"){
   getFaveOnClick();
 } else {
   getRandOnClick();
 }
 
 changeImageSize();
+
 //-----temp-------
-console.log("imageSize is " + localStorage.imageSize);
-console.log("faveBoolean is " + localStorage.faveBoolean);
-console.log("numberOfCats is " + localStorage.numberOfCats);
-console.log("userID is " + localStorage.userID);
-console.log("multipleBoolean is " + localStorage.multipleBoolean);
+$("#showCookies").click(function(){
+  console.log("imageSize is " + localStorage.imageSize);
+  console.log("faveBoolean is " + localStorage.faveBoolean);
+  console.log("numberOfCats is " + localStorage.numberOfCats);
+  console.log("userID is " + localStorage.userID);
+  console.log("multipleBoolean is " + localStorage.multipleBoolean);
+})
+
 $("#resetCookies").click(function(){
   localStorage.clear();
 })
 
 //--Listeners--
 $("#imageSizeSlider").change(function(){
+  console.log("slider changed")
+
   localStorage.imageSize = $("#imageSizeSlider").val();
   changeImageSize();
 });
 
 $("input[name=numberMode]:radio").change(function(){
-  if ($(this).val() === "one"){
+  console.log("radio changed")
+
+  if ($("input[name=\"numberMode\"]:checked").val() === "one"){
     singleMode();
   } else {
     multiMode();
@@ -73,43 +79,50 @@ $("input[name=numberMode]:radio").change(function(){
 });
 
 function singleMode(){
+  console.log("singleMode")
 
-//     change text of getFaves and newCAt buttons to singular
-//     save local storage multipleBoolean: false
-//   howManyCatsSlider hide
-//   sizeSlider hide
-//   make sure radio "number" is "one" and not "many"
-//   show singleCatDiv
-//   hide multipleCatsDiv
-//   hide catsNumberInput
+  $("#getFavesButton").text("Get Fave");
+  $("#newCatsButton").text("Get New Cat");
+  localStorage.multipleBoolean = false;
+  $("[name=\"numberMode\"]").removeAttr("checked");
+  $("input[name=numberMode][value=one]").prop("checked", true);
+  $("#catsNumberInput").hide();
+  $("#sliderContainer").hide();
+  $("#multipleCatsDiv").hide();
+  $("#singleCatDiv").show();
 }
 
 function multiMode(){
-    //change text of getFaves and newCAt buttons to multiple
-    //save local storage multipleBoolean: true
-//   howManyCatsSlider show
-//   sizeSlider show
-//   make sure radio "number" is "many" and not "one"
-//   hide singleCatDiv
-//   show multipleCatsDiv
-//   show catsNumberInput
+  console.log("multiMode")
+
+  $("#getFavesButton").text("Get Faves");
+  $("#newCatsButton").text("Get New Cats");
+  localStorage.multipleBoolean = true;
+  $("[name=\"numberMode\"]").removeAttr("checked");
+  $("input[name=numberMode][value=many]").prop("checked", true);
+  $("#catsNumberInput").show();
+  $("#sliderContainer").show();
+  $("#multipleCatsDiv").show();
+  $("#singleCatDiv").hide();
 }
 
 function getFaveOnClick(){
-  //   isOnFave = true;
-        //save local storage faveBoolean: true
-  //   setDivs(shuffleArray(getFaveCats(getCatLimit())));
-  //changeImageSize()
+  console.log("getFaveOnClick")
+
+  localStorage.faveBoolean = true;
+  setDivs(shuffleArray(getFaveCats(getCatLimit())));
 }
 
 function getRandOnClick(){
-  //   isOnFave = false;
-      //save local storage faveBoolean: false
-  //   setDivs(getRandomCats(getCatLimit()));
-  //changeImageSize()
+  console.log("getRandOnClick")
+
+  localStorage.faveBoolean = false;
+  setDivs(getRandomCats(getCatLimit()));
 }
 
 function setDivs(array){
+  console.log("setDivs")
+
 //   singleCatDiv.innerHTML = ""
 //   multipleCatsDiv.innerHTML = ""
 //   createResponsiveDiv(singleCatDiv, array[0]);
@@ -123,6 +136,8 @@ function setDivs(array){
 }
 
 function createResponsiveDiv(div, cat){
+  console.log("createResponsiveDiv")
+
 //   add button to div
 //   add img to div
 //   img add src as cat["url"];
@@ -136,6 +151,8 @@ function createResponsiveDiv(div, cat){
 }
 
 function getRandomCats(catLimit){
+  console.log("getRandomCats")
+
 //   var catsArray = [];
 //   {
 //     //pass sub_id IF it is set
@@ -149,6 +166,8 @@ function getRandomCats(catLimit){
 }
 
 function getFaveCats(catLimit){
+  console.log("getFaveCats")
+
 //   var outputArray = [];
 //   var inputArray = getFaveArray(catLimit);
 //   for each cat in inputArray:{
@@ -163,16 +182,23 @@ function getFaveCats(catLimit){
 }
 
 function shuffleArray(array){
+  console.log("shuffleArray")
+
 //   return shuffledArray;
 }
 
 function getFaveArray(catLimit){
+  console.log("getFaveArray")
+
 //   //need to put in limit parameter
 //   //API
 //   return faveArray
 }
 
 function getCatLimit(){
+  console.log("getCatLimit")
+
+
     //var catNumber = 10;
 //   if there is a number in catsNumberInput{
 //     catnumber = catsNumberInput number;}
@@ -181,6 +207,8 @@ function getCatLimit(){
 }
 
 function changeImageSize(){
+  console.log("changeImageSize")
+
 //   var dimensions = get slider value
 //   change css of imageCard class to height = dimensions, width = dimensions
 }
@@ -245,7 +273,7 @@ function changeImageSize(){
   //   });
   // }
   //
-  // $("#newCatButton").click(function() {
+  // $("#newCatsButton").click(function() {
   //   getRandomCat();
   //   $("#currentCat").show();
   //   $("#addToFavoritesButton").show();
