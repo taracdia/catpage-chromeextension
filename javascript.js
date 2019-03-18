@@ -1,6 +1,7 @@
 $(document).ready(function() {
   // TODO: handle situation where they have no faves yet
   // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
+  // TODO: handle duplicate clicks from waiting for load
 
   /*
   sub_id in API is userID in local storage
@@ -11,284 +12,256 @@ $(document).ready(function() {
     set: the user's ID
   */
 
-for (var i = 0; i < 100; i++){
-  var div = $("<div class='imageCard'></div>");
-  var btn = $("<button class='imageButton'>btn</button>");
-  var img = $("<img>");
+  for (var i = 0; i < 100; i++) {
+    var div = $("<div class='imageCard'></div>");
+    var btn = $("<button class='imageButton'>+</button>");
+    var img = $("<img>");
 
-  $("#multipleCatsDiv").append(div);
+    $("#multipleCatsDiv").append(div);
     div.append(btn);
     div.append(img);
-}
-//workaround to avoid code duplication and having to make a deep copy of an object
-function getSettings() {
-  return {
-    "async": true,
-    "crossDomain": true,
-    "headers": {
-      "content-type": "application/json",
-      "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
-    },
-    "processData": false,
   }
-}
+  //workaround to avoid code duplication and having to make a deep copy of an object
+  function getSettings() {
+    return {
+      "async": true,
+      "crossDomain": true,
+      "headers": {
+        "content-type": "application/json",
+        "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
+      },
+      "processData": false,
+    }
+  }
 
-//-----Set up with local storage-----
-  if (typeof localStorage.userID === "undefined"){
+  //-----Set up with local storage-----
+  if (typeof localStorage.userID === "undefined") {
     chrome.identity.getProfileUserInfo(function(userInfo) {
       var userID = JSON.stringify(userInfo["id"]);
       userID = userID.replace(/"/g, "");
       if (userID === "") {
         $("#newCatsButton").attr("disabled", true);
         $("#getFavesButton").attr("disabled", true);
-      } else  {
+        $(".imageButton").attr("disabled", true);
+      } else {
         localStorage.userID = userID;
       }
     });
   }
 
-  if(localStorage.multipleBoolean && localStorage.multipleBoolean === "true"){
+  if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
     multiMode();
   } else {
     singleMode();
   }
 
-if(localStorage.numberOfCats){
-  $("#catsNumberInput").val(localStorage.numberOfCats);
-}
+  if (localStorage.numberOfCats) {
+    $("#catsNumberInput").val(localStorage.numberOfCats);
+  }
 
-if(localStorage.imageSize){
-  $("#imageSizeSlider").val(localStorage.imageSize);
-}
+  if (localStorage.imageSize) {
+    $("#imageSizeSlider").val(localStorage.imageSize);
+  }
 
-if(localStorage.faveBoolean && localStorage.faveBoolean === "true"){
-  getFaveOnClick();
-} else {
-  getRandOnClick();
-}
+  if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
+    getFaveOnClick();
+  } else {
+    getRandOnClick();
+  }
 
-changeImageSize();
-
-//-----temp-------
-$("#showCookies").click(function(){
-  console.log("imageSize is " + localStorage.imageSize);
-  console.log("faveBoolean is " + localStorage.faveBoolean);
-  console.log("numberOfCats is " + localStorage.numberOfCats);
-  console.log("userID is " + localStorage.userID);
-  console.log("multipleBoolean is " + localStorage.multipleBoolean);
-})
-
-$("#resetCookies").click(function(){
-  localStorage.clear();
-})
-
-//--Listeners--
-$("#imageSizeSlider").change(function(){
-  console.log("slider changed");
-
-  localStorage.imageSize = $("#imageSizeSlider").val();
   changeImageSize();
-});
 
-$("input[name=numberMode]:radio").change(function(){
-  console.log("radio changed");
+  //-----temp-------
+  $("#showCookies").click(function() {
+    console.log("imageSize is " + localStorage.imageSize);
+    console.log("faveBoolean is " + localStorage.faveBoolean);
+    console.log("numberOfCats is " + localStorage.numberOfCats);
+    console.log("userID is " + localStorage.userID);
+    console.log("multipleBoolean is " + localStorage.multipleBoolean);
+  })
 
-  if ($("input[name='numberMode']:checked").val() === "one"){
-    singleMode();
-  } else {
-    multiMode();
+  $("#resetCookies").click(function() {
+    localStorage.clear();
+  })
+  //-----temp------
+  //--Listeners--
+  $("#imageSizeSlider").change(function() {
+    console.log("slider changed");
+
+    localStorage.imageSize = $("#imageSizeSlider").val();
+    changeImageSize();
+  });
+
+  $("input[name=numberMode]:radio").change(function() {
+    console.log("radio changed");
+
+    if ($("input[name='numberMode']:checked").val() === "one") {
+      singleMode();
+    } else {
+      multiMode();
+    }
+  });
+
+  function singleMode() {
+    console.log("singleMode");
+
+    $("#getFavesButton").text("Get Fave");
+    $("#newCatsButton").text("Get New Cat");
+    localStorage.multipleBoolean = false;
+    $("[name='numberMode']").removeAttr("checked");
+    $("input[name=numberMode][value=one]").prop("checked", true);
+    $("#catsNumberInput").hide();
+    $("#sliderContainer").hide();
+    $("#multipleCatsDiv").hide();
+    $("#singleCatDiv").show();
   }
-});
 
-function singleMode(){
-  console.log("singleMode");
+  function multiMode() {
+    console.log("multiMode");
 
-  $("#getFavesButton").text("Get Fave");
-  $("#newCatsButton").text("Get New Cat");
-  localStorage.multipleBoolean = false;
-  $("[name='numberMode']").removeAttr("checked");
-  $("input[name=numberMode][value=one]").prop("checked", true);
-  $("#catsNumberInput").hide();
-  $("#sliderContainer").hide();
-  $("#multipleCatsDiv").hide();
-  $("#singleCatDiv").show();
-}
+    $("#getFavesButton").text("Get Faves");
+    $("#newCatsButton").text("Get New Cats");
+    localStorage.multipleBoolean = true;
+    $("[name='numberMode']").removeAttr("checked");
+    $("input[name=numberMode][value=many]").prop("checked", true);
+    $("#catsNumberInput").show();
+    $("#sliderContainer").show();
+    $("#multipleCatsDiv").show();
+    $("#singleCatDiv").hide();
+  }
 
-function multiMode(){
-  console.log("multiMode");
+  function getFaveOnClick() {
+    console.log("getFaveOnClick");
 
-  $("#getFavesButton").text("Get Faves");
-  $("#newCatsButton").text("Get New Cats");
-  localStorage.multipleBoolean = true;
-  $("[name='numberMode']").removeAttr("checked");
-  $("input[name=numberMode][value=many]").prop("checked", true);
-  $("#catsNumberInput").show();
-  $("#sliderContainer").show();
-  $("#multipleCatsDiv").show();
-  $("#singleCatDiv").hide();
-}
+    localStorage.faveBoolean = true;
+    setDivs(shuffleArray(getFaveCats(getCatLimit())));
+  }
 
-function getFaveOnClick(){
-  console.log("getFaveOnClick");
+  function getRandOnClick() {
+    console.log("getRandOnClick");
 
-  localStorage.faveBoolean = true;
-  setDivs(shuffleArray(getFaveCats(getCatLimit())));
-}
+    localStorage.faveBoolean = false;
+    getRandomCats(getCatLimit());
+  }
 
-function getRandOnClick(){
-  console.log("getRandOnClick");
+  function setDivs(array) {
+    console.log("setDivs");
 
-  localStorage.faveBoolean = false;
-  setDivs(getRandomCats(getCatLimit()));
-}
+    changeDiv($("#singleCatDiv"), array[0]);
 
-function setDivs(array){
-  console.log("setDivs");
+    for (var i = 0; i < 100; i++) {
+      var div = $("#multipleCatsDiv div").eq(i);
+      if (i < array.length) {
+        div.show();
+        changeDiv(div, array[i]);
+      } else {
+        div.hide();
+      }
+    }
+  }
 
-  // changeDiv($("#singleCatDiv"), array[0]);
-  //
-  // for (var i = 0; i < array.length; i++){
-  //   if (i < array.length){
-  //     var div = multipleCatsDiv's ith div;
-  //     changeDiv(div, array[i]);
-  //   } else {
-  //     hide ith div
-  //   }
-  // }
-}
+  function changeDiv(div, cat) {
+    console.log("changeDiv")
 
-function changeDiv(div, cat){
-  console.log("createResponsiveDiv")
+    if (typeof cat === "undefined"){
+      //check if this check is necessary
+      div.hide();
+    } else {
+      // var btn = div's button
+      var img = div.children("img");
+      img.attr("src", cat["url"]);
+      img.attr("id", cat["id"]);
 
-  // if cat is undefined{
-  //   hide div
-  // } else {
-  //   var btn = div's button
-  //   var img = div's img
-  //   img.attr("src", cat["url"]);
-  //   img.attr("id", cat["id"]);
-  //
-  //   if (cat["fave_id"]){
-  //     console.log("cat['fave_id'] exists");
-  //     img.attr("alt", cat["fave_id"]);
-  //     //     change button to delete type**
-  //   } else {
-  //     console.log("cat['fave_id'] not exists");
-  //     img.attr("alt", "");
-  //     if cat is already in faves{
-  //       //change button to already in faves button
-  //     }else {
-  //       //     change button to addFaves type**
-  //     }
-  //   }
-  // }
-}
+      if (cat["fave_id"]){
+        console.log("cat['fave_id'] exists");
+        img.attr("alt", cat["fave_id"]);
+        //     change button to delete type**
+      } else {
+        console.log("cat['fave_id'] not exists");
+        img.attr("alt", "");
+        // if cat is already in faves{
+        //   //change button to already in faves button
+        // }else {
+        //   //     change button to addFaves type**
+        // }
+      }
+    }
+  }
 
-function getRandomCats(catLimit){
-  console.log("getRandomCats");
+  function getRandomCats(catLimit) {
+    console.log("getRandomCats");
 
-  var settings = getSettings();
-  settings.url = "https://api.thecatapi.com/v1/images/search";
-  settings.method = "GET";
-  settings.async = false;
-  //pass sub_id IF it is set
+    var settings = getSettings();
+    settings.method = "GET";
+    settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + catLimit;
+    if (localStorage.userID) {
+      settings.url += "&sub_id=" + localStorage.userID;
+    }
 
-  var skipCounter = 0;
-  var catsArray = [];
-  do {
+    console.log(settings);
     $.ajax(settings).done(function(response) {
-      // if (it has include_favourite = 1){
-      //   skipCounter++;
-      // } else{
-        catsArray.push(response[0]);
-      // }
-
-      // if(skipCounter > 10){
-      //   //break out of do while loop so that requests don't take too long
-      // }
+      var catsArray = response;
+      console.log(catsArray);
+      setDivs(catsArray);
     });
+  }
 
+  function getFaveCats(catLimit) {
+    console.log("getFaveCats")
 
-  } while (catsArray.length < catLimit);
+    //   var outputArray = [];
+    //   var inputArray = getFaveArray(catLimit);
+    //   for each cat in inputArray:{
+    //     make object;
+    //     object["fave_id"] = cat["id"];
+    //     object["id"] = cat["image"]["id"];
+    //     object["url"] = cat["image"]["url"];
+    //
+    //     add object to outputArray
+    //   }
+    //   return outputArray;
+  }
 
-  console.log(catsArray);
-  return catsArray;
-}
+  function shuffleArray(array, limit) {
+    console.log("shuffleArray");
 
-function getFaveCats(catLimit){
-  console.log("getFaveCats")
+    //shuffle the array
+    //return an array that only has as many cats as limit
 
-//   var outputArray = [];
-//   var inputArray = getFaveArray(catLimit);
-//   for each cat in inputArray:{
-//     make object;
-//     object["fave_id"] = cat["id"];
-//     object["id"] = cat["image"]["id"];
-//     object["url"] = cat["image"]["url"];
-//
-//     add object to outputArray
-//   }
-//   return outputArray;
-}
+    return array;
+  }
 
-function shuffleArray(array, limit){
-  console.log("shuffleArray");
+  function getFaveArray(catLimit) {
+    console.log("getFaveArray")
 
-  //shuffle the array
-  //return an array that only has as many cats as limit
+    //   //need to put in limit parameter
+    //   //API
+    //   return faveArray
+  }
 
-  return array;
-}
+  //------------
 
-function getFaveArray(catLimit){
-  console.log("getFaveArray")
-
-//   //need to put in limit parameter
-//   //API
-//   return faveArray
-}
-
-//------------
-
-function getCatLimit(){
-  console.log("getCatLimit")
+  function getCatLimit() {
+    console.log("getCatLimit")
 
     var catNumber = 10; //default is 10
     var numberInput = $("#catsNumberInput").val();
 
-    if(numberInput > 0 && numberInput <= 100){
+    if (numberInput > 0 && numberInput <= 100) {
       catNumber = numberInput;
     }
 
     localStorage.numberOfCats = catNumber;
-  return catNumber;
-}
+    return catNumber;
+  }
 
-function changeImageSize(){
-  console.log("changeImageSize")
+  function changeImageSize() {
+    console.log("changeImageSize")
 
-  var dimensions = $("#imageSizeSlider").val();
-  $(".imageCard").height(dimensions);
-  $(".imageCard").width(dimensions);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    var dimensions = $("#imageSizeSlider").val();
+    $(".imageCard").height(dimensions);
+    $(".imageCard").width(dimensions);
+  }
 
 
 
