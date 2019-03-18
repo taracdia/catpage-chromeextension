@@ -1,5 +1,4 @@
 $(document).ready(function() {
-  // TODO: handle blocking extra clicks so they don't favorite/delete the wrong picture
   // TODO: handle situation where they have no faves yet
   // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
 
@@ -12,17 +11,40 @@ $(document).ready(function() {
     set: the user's ID
   */
 
-for (var i = 0; i < 10; i++){
-  $("#multipleCatsDiv").append($("<div class=\"imageCard\"></div>"));
+for (var i = 0; i < 100; i++){
+  var div = $("<div class='imageCard'></div>");
+  var btn = $("<button class='imageButton'>btn</button>");
+  var img = $("<img>");
+
+  $("#multipleCatsDiv").append(div);
+    div.append(btn);
+    div.append(img);
+}
+//workaround to avoid code duplication and having to make a deep copy of an object
+function getSettings() {
+  return {
+    "async": true,
+    "crossDomain": true,
+    "headers": {
+      "content-type": "application/json",
+      "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
+    },
+    "processData": false,
+  }
 }
 
 //-----Set up with local storage-----
-  if (typeof localStorage.userID !== "undefined"){
-    //run the function to check for ID from browser
-    //if it's empty:
-        //TODO: handle email-less users: disable addToFavoritesButton, getFavesButton, radio "mode"
-    //else:
-      //save the ID to userID in localStorage
+  if (typeof localStorage.userID === "undefined"){
+    chrome.identity.getProfileUserInfo(function(userInfo) {
+      var userID = JSON.stringify(userInfo["id"]);
+      userID = userID.replace(/"/g, "");
+      if (userID === "") {
+        $("#newCatsButton").attr("disabled", true);
+        $("#getFavesButton").attr("disabled", true);
+      } else  {
+        localStorage.userID = userID;
+      }
+    });
   }
 
   if(localStorage.multipleBoolean && localStorage.multipleBoolean === "true"){
@@ -62,16 +84,16 @@ $("#resetCookies").click(function(){
 
 //--Listeners--
 $("#imageSizeSlider").change(function(){
-  console.log("slider changed")
+  console.log("slider changed");
 
   localStorage.imageSize = $("#imageSizeSlider").val();
   changeImageSize();
 });
 
 $("input[name=numberMode]:radio").change(function(){
-  console.log("radio changed")
+  console.log("radio changed");
 
-  if ($("input[name=\"numberMode\"]:checked").val() === "one"){
+  if ($("input[name='numberMode']:checked").val() === "one"){
     singleMode();
   } else {
     multiMode();
@@ -79,12 +101,12 @@ $("input[name=numberMode]:radio").change(function(){
 });
 
 function singleMode(){
-  console.log("singleMode")
+  console.log("singleMode");
 
   $("#getFavesButton").text("Get Fave");
   $("#newCatsButton").text("Get New Cat");
   localStorage.multipleBoolean = false;
-  $("[name=\"numberMode\"]").removeAttr("checked");
+  $("[name='numberMode']").removeAttr("checked");
   $("input[name=numberMode][value=one]").prop("checked", true);
   $("#catsNumberInput").hide();
   $("#sliderContainer").hide();
@@ -93,12 +115,12 @@ function singleMode(){
 }
 
 function multiMode(){
-  console.log("multiMode")
+  console.log("multiMode");
 
   $("#getFavesButton").text("Get Faves");
   $("#newCatsButton").text("Get New Cats");
   localStorage.multipleBoolean = true;
-  $("[name=\"numberMode\"]").removeAttr("checked");
+  $("[name='numberMode']").removeAttr("checked");
   $("input[name=numberMode][value=many]").prop("checked", true);
   $("#catsNumberInput").show();
   $("#sliderContainer").show();
@@ -107,62 +129,90 @@ function multiMode(){
 }
 
 function getFaveOnClick(){
-  console.log("getFaveOnClick")
+  console.log("getFaveOnClick");
 
   localStorage.faveBoolean = true;
   setDivs(shuffleArray(getFaveCats(getCatLimit())));
 }
 
 function getRandOnClick(){
-  console.log("getRandOnClick")
+  console.log("getRandOnClick");
 
   localStorage.faveBoolean = false;
   setDivs(getRandomCats(getCatLimit()));
 }
 
 function setDivs(array){
-  console.log("setDivs")
+  console.log("setDivs");
 
-//   singleCatDiv.innerHTML = ""
-//   multipleCatsDiv.innerHTML = ""
-//   createResponsiveDiv(singleCatDiv, array[0]);
-//
-//   for (var i = 0; i < array.length; i++){
-//     create div
-//     createResponsiveDiv(div, array[i]);
-//     add div to multipleCatsDiv
-//     add class="imageCard" to div
-//   }
+  // changeDiv($("#singleCatDiv"), array[0]);
+  //
+  // for (var i = 0; i < array.length; i++){
+  //   if (i < array.length){
+  //     var div = multipleCatsDiv's ith div;
+  //     changeDiv(div, array[i]);
+  //   } else {
+  //     hide ith div
+  //   }
+  // }
 }
 
-function createResponsiveDiv(div, cat){
+function changeDiv(div, cat){
   console.log("createResponsiveDiv")
 
-//   add button to div
-//   add img to div
-//   img add src as cat["url"];
-//   img add id as cat["id"];
-//   if cat["fave_id"] exists:
-//     set it to img's alt
-//     button is delete type**
-//   else:
-//     set img's alt to empty string
-//     button is addFaves type**
+  // if cat is undefined{
+  //   hide div
+  // } else {
+  //   var btn = div's button
+  //   var img = div's img
+  //   img.attr("src", cat["url"]);
+  //   img.attr("id", cat["id"]);
+  //
+  //   if (cat["fave_id"]){
+  //     console.log("cat['fave_id'] exists");
+  //     img.attr("alt", cat["fave_id"]);
+  //     //     change button to delete type**
+  //   } else {
+  //     console.log("cat['fave_id'] not exists");
+  //     img.attr("alt", "");
+  //     if cat is already in faves{
+  //       //change button to already in faves button
+  //     }else {
+  //       //     change button to addFaves type**
+  //     }
+  //   }
+  // }
 }
 
 function getRandomCats(catLimit){
-  console.log("getRandomCats")
+  console.log("getRandomCats");
 
-//   var catsArray = [];
-//   {
-//     //pass sub_id IF it is set
-//     get a random cat
-//     if it has include_favourite = 1:
-//       skip
-//     else:
-//       add it to catsArray
-//   } do while catsArray.length < catLimit
-//   return catsArray;
+  var settings = getSettings();
+  settings.url = "https://api.thecatapi.com/v1/images/search";
+  settings.method = "GET";
+  settings.async = false;
+  //pass sub_id IF it is set
+
+  var skipCounter = 0;
+  var catsArray = [];
+  do {
+    $.ajax(settings).done(function(response) {
+      // if (it has include_favourite = 1){
+      //   skipCounter++;
+      // } else{
+        catsArray.push(response[0]);
+      // }
+
+      // if(skipCounter > 10){
+      //   //break out of do while loop so that requests don't take too long
+      // }
+    });
+
+
+  } while (catsArray.length < catLimit);
+
+  console.log(catsArray);
+  return catsArray;
 }
 
 function getFaveCats(catLimit){
@@ -181,10 +231,13 @@ function getFaveCats(catLimit){
 //   return outputArray;
 }
 
-function shuffleArray(array){
-  console.log("shuffleArray")
+function shuffleArray(array, limit){
+  console.log("shuffleArray");
 
-//   return shuffledArray;
+  //shuffle the array
+  //return an array that only has as many cats as limit
+
+  return array;
 }
 
 function getFaveArray(catLimit){
@@ -195,13 +248,16 @@ function getFaveArray(catLimit){
 //   return faveArray
 }
 
+//------------
+
 function getCatLimit(){
   console.log("getCatLimit")
 
-    var catNumber = 10;
+    var catNumber = 10; //default is 10
+    var numberInput = $("#catsNumberInput").val();
 
-    if($("#catsNumberInput").val() > 0){
-      catNumber = $("#catsNumberInput").val();
+    if(numberInput > 0 && numberInput <= 100){
+      catNumber = numberInput;
     }
 
     localStorage.numberOfCats = catNumber;
@@ -239,30 +295,9 @@ function changeImageSize(){
 
 
 
-  //old code to return to
-  // getRandomCat();
-  // var userID;
-  // chrome.identity.getProfileUserInfo(function(userInfo) {
-  //   userID = JSON.stringify(userInfo["id"]);
-  //   userID = userID.replace(/"/g, "");
-  //   if (userID === "") {
-  //     $("#addToFavoritesButton").attr("disabled", true);
-  //     $("#getFavoritesButton").attr("disabled", true);
-  //   }
-  // });
-  //
-  // //workaround to avoid code duplication and having to make a deep copy of an object
-  // function getSettings() {
-  //   return {
-  //     "async": true,
-  //     "crossDomain": true,
-  //     "headers": {
-  //       "content-type": "application/json",
-  //       "x-api-key": "d2685ff7-e0ef-437e-8c49-0cc03abf9bbd"
-  //     },
-  //     "processData": false,
-  //   }
-  // }
+
+
+
   //
   // function getRandomCat() {
   //   var settings = getSettings();
@@ -289,7 +324,7 @@ function changeImageSize(){
   //   var settings = getSettings();
   //   settings.url = "https://api.thecatapi.com/v1/favourites";
   //   settings.method = "POST";
-  //   settings.data = "{\"image_id\":\"" + currentImageID + "\",\"sub_id\":\"" + userID + "\"}";
+  //   settings.data = "{'image_id':'" + currentImageID + "','sub_id':'" + userID + "'}";
   //
   //   $.ajax(settings)
   //     .done(function(response) {

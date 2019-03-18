@@ -9,7 +9,7 @@
     max-height: 100%;
 }
 
-.imageCard {
+.imageCard, img {
   height: 200px;
   width: 200px;
   border-style: solid
