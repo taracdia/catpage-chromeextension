@@ -21,6 +21,19 @@ $(document).ready(function() {
     div.append(btn);
     div.append(img);
   }
+
+  $(".imageButton").hide();
+
+  $(".imageCard").mouseover(function() {
+    var btn = $(this).children("button");
+    btn.show();
+  });
+
+  $(".imageCard").mouseout(function() {
+    var btn = $(this).children("button");
+    btn.hide();
+  });
+
   //workaround to avoid code duplication and having to make a deep copy of an object
   function getSettings() {
     return {
@@ -64,9 +77,9 @@ $(document).ready(function() {
   }
 
   if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
-    getFaveOnClick();
+    getFaveCats(getCatLimit());
   } else {
-    getRandOnClick();
+    getRandomCats(getCatLimit());
   }
 
   changeImageSize();
@@ -86,15 +99,11 @@ $(document).ready(function() {
   //-----temp------
   //--Listeners--
   $("#imageSizeSlider").change(function() {
-    console.log("slider changed");
-
     localStorage.imageSize = $("#imageSizeSlider").val();
     changeImageSize();
   });
 
   $("input[name=numberMode]:radio").change(function() {
-    console.log("radio changed");
-
     if ($("input[name='numberMode']:checked").val() === "one") {
       singleMode();
     } else {
@@ -103,8 +112,6 @@ $(document).ready(function() {
   });
 
   function singleMode() {
-    console.log("singleMode");
-
     $("#getFavesButton").text("Get Fave");
     $("#newCatsButton").text("Get New Cat");
     localStorage.multipleBoolean = false;
@@ -130,23 +137,17 @@ $(document).ready(function() {
     $("#singleCatDiv").hide();
   }
 
-  function getFaveOnClick() {
-    console.log("getFaveOnClick");
+  $("#getFavesButton").click(function() {
+    getFaveCats(getCatLimit());
+  });
 
-    localStorage.faveBoolean = true;
-    setDivs(shuffleArray(getFaveCats(getCatLimit())));
-  }
 
-  function getRandOnClick() {
-    console.log("getRandOnClick");
+  $("#newCatsButton").click(function() {
+    getRandomCats(getCatLimit);
+  });
 
-    localStorage.faveBoolean = false;
-    getRandomCats(getCatLimit());
-  }
 
   function setDivs(array) {
-    console.log("setDivs");
-
     changeDiv($("#singleCatDiv"), array[0]);
 
     for (var i = 0; i < 100; i++) {
@@ -163,22 +164,28 @@ $(document).ready(function() {
   function changeDiv(div, cat) {
     console.log("changeDiv")
 
-    if (typeof cat === "undefined"){
-      //check if this check is necessary
+    if (typeof cat === "undefined") {
       div.hide();
+      console.log("cat is undefined");
     } else {
-      // var btn = div's button
+      var btn = div.children("button");
       var img = div.children("img");
       img.attr("src", cat["url"]);
       img.attr("id", cat["id"]);
 
-      if (cat["fave_id"]){
-        console.log("cat['fave_id'] exists");
+      if (cat["fave_id"]) {
         img.attr("alt", cat["fave_id"]);
         //     change button to delete type**
+        btn.addClass("deleteButton");
+        btn.removeClass("addFaveButton");
+        btn.click(function(){
+
+        });
+
       } else {
-        console.log("cat['fave_id'] not exists");
         img.attr("alt", "");
+        btn.removeClass("deleteButton");
+        btn.addClass("addFaveButton");
         // if cat is already in faves{
         //   //change button to already in faves button
         // }else {
@@ -189,7 +196,7 @@ $(document).ready(function() {
   }
 
   function getRandomCats(catLimit) {
-    console.log("getRandomCats");
+    localStorage.faveBoolean = false;
 
     var settings = getSettings();
     settings.method = "GET";
@@ -198,53 +205,54 @@ $(document).ready(function() {
       settings.url += "&sub_id=" + localStorage.userID;
     }
 
-    console.log(settings);
     $.ajax(settings).done(function(response) {
-      var catsArray = response;
-      console.log(catsArray);
-      setDivs(catsArray);
+      setDivs(response);
     });
   }
 
+  function formatFave(fave) {
+    var formattedFave = fave["image"];
+    formattedFave["fave_id"] = fave["id"]
+    return formattedFave;
+  }
+
+  function shuffleArray(inputArray, catLimit) {
+    var outputArray = [];
+    var checkArray = [];
+    var counter = 0;
+
+    if (inputArray.length < catLimit) {
+      catLimit = inputArray.length;
+    }
+
+    do {
+      var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
+      if (jQuery.inArray(fave, checkArray) === -1) {
+        outputArray.push(formatFave(fave));
+        checkArray.push(fave);
+
+        counter++;
+      }
+    } while (counter < catLimit);
+
+    return outputArray;
+  }
+
   function getFaveCats(catLimit) {
-    console.log("getFaveCats")
+    localStorage.faveBoolean = true;
 
-    //   var outputArray = [];
-    //   var inputArray = getFaveArray(catLimit);
-    //   for each cat in inputArray:{
-    //     make object;
-    //     object["fave_id"] = cat["id"];
-    //     object["id"] = cat["image"]["id"];
-    //     object["url"] = cat["image"]["url"];
-    //
-    //     add object to outputArray
-    //   }
-    //   return outputArray;
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/favourites?sub_id=" + localStorage.userID;
+    settings.method = "GET";
+
+    $.ajax(settings).done(function(response) {
+      var faveArray = shuffleArray(response, catLimit);
+      setDivs(faveArray);
+    });
   }
-
-  function shuffleArray(array, limit) {
-    console.log("shuffleArray");
-
-    //shuffle the array
-    //return an array that only has as many cats as limit
-
-    return array;
-  }
-
-  function getFaveArray(catLimit) {
-    console.log("getFaveArray")
-
-    //   //need to put in limit parameter
-    //   //API
-    //   return faveArray
-  }
-
-  //------------
 
   function getCatLimit() {
-    console.log("getCatLimit")
-
-    var catNumber = 10; //default is 10
+    var catNumber = 15; //default is 10
     var numberInput = $("#catsNumberInput").val();
 
     if (numberInput > 0 && numberInput <= 100) {
@@ -256,8 +264,6 @@ $(document).ready(function() {
   }
 
   function changeImageSize() {
-    console.log("changeImageSize")
-
     var dimensions = $("#imageSizeSlider").val();
     $(".imageCard").height(dimensions);
     $(".imageCard").width(dimensions);

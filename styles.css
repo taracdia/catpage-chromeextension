@@ -12,6 +12,14 @@ img {
   border-color: red;
 }
 
-.deleteButton {
+.imageButton {
   position: absolute;
+}
+
+.deleteButton {
+  background-color: red;
+}
+
+.addFaveButton {
+  background-color: yellow;
 }
