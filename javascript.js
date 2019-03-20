@@ -15,6 +15,9 @@ $(document).ready(function() {
   //initial setup
   for (var i = 0; i < 100; i++) {
     var div = $("<div class='imageCard'></div>");
+    // if (i === 0){
+    //   div.addClass("firstMultDiv");
+    // }
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
     $("#multipleCatsDiv").append(div);
