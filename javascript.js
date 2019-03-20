@@ -1,8 +1,9 @@
 $(document).ready(function() {
-  // TODO: handle situation where they have no faves yet
-  // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
-  // TODO: handle duplicate clicks from waiting for load
-
+  /*
+      // TODO: handle situation where they have no faves yet
+      // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
+      // TODO: handle duplicate clicks from waiting for load
+  */
   /*
   sub_id in API is userID in local storage
 
@@ -11,12 +12,11 @@ $(document).ready(function() {
     empty: empty string. Means user is not logged in to Chrome
     set: the user's ID
   */
-
+  //initial setup
   for (var i = 0; i < 100; i++) {
     var div = $("<div class='imageCard'></div>");
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
-
     $("#multipleCatsDiv").append(div);
     div.append(btn);
     div.append(img);
@@ -47,7 +47,7 @@ $(document).ready(function() {
     }
   }
 
-  //-----Set up with local storage-----
+  //-----local storage settings-----
   if (typeof localStorage.userID === "undefined") {
     chrome.identity.getProfileUserInfo(function(userInfo) {
       var userID = JSON.stringify(userInfo["id"]);
@@ -83,7 +83,6 @@ $(document).ready(function() {
   }
 
   changeImageSize();
-
   //-----temp-------
   $("#showCookies").click(function() {
     console.log("imageSize is " + localStorage.imageSize);
@@ -92,7 +91,6 @@ $(document).ready(function() {
     console.log("userID is " + localStorage.userID);
     console.log("multipleBoolean is " + localStorage.multipleBoolean);
   })
-
   $("#resetCookies").click(function() {
     localStorage.clear();
   })
@@ -124,8 +122,6 @@ $(document).ready(function() {
   }
 
   function multiMode() {
-    console.log("multiMode");
-
     $("#getFavesButton").text("Get Faves");
     $("#newCatsButton").text("Get New Cats");
     localStorage.multipleBoolean = true;
@@ -141,11 +137,9 @@ $(document).ready(function() {
     getFaveCats(getCatLimit());
   });
 
-
   $("#newCatsButton").click(function() {
     getRandomCats(getCatLimit);
   });
-
 
   function setDivs(array) {
     changeDiv($("#singleCatDiv"), array[0]);
@@ -153,7 +147,6 @@ $(document).ready(function() {
     for (var i = 0; i < 100; i++) {
       var div = $("#multipleCatsDiv div").eq(i);
       if (i < array.length) {
-        div.show();
         changeDiv(div, array[i]);
       } else {
         div.hide();
@@ -162,35 +155,66 @@ $(document).ready(function() {
   }
 
   function changeDiv(div, cat) {
-    console.log("changeDiv")
-
+    //if they hit the singleCatDiv button or the first multicatdiv button, will need to prevent them from hitting the button on the other one's side
+    //add already deleted button?
     if (typeof cat === "undefined") {
       div.hide();
       console.log("cat is undefined");
     } else {
+      div.show();
       var btn = div.children("button");
       var img = div.children("img");
-      img.attr("src", cat["url"]);
-      img.attr("id", cat["id"]);
 
-      if (cat["fave_id"]) {
-        img.attr("alt", cat["fave_id"]);
+      if (cat["image"]) {
+        img.attr("src", cat["image"]["url"]);
         //     change button to delete type**
         btn.addClass("deleteButton");
         btn.removeClass("addFaveButton");
-        btn.click(function(){
-
-        });
-
-      } else {
-        img.attr("alt", "");
         btn.removeClass("deleteButton");
-        btn.addClass("addFaveButton");
-        // if cat is already in faves{
-        //   //change button to already in faves button
-        // }else {
-        //   //     change button to addFaves type**
-        // }
+        btn.click(function() {
+          var settings = getSettings();
+          settings.url = "https://api.thecatapi.com/v1/favourites/" + cat["id"];
+          settings.method = "DELETE";
+          $.ajax(settings).done(function(response) {
+            // TODO: inform them of the deletion
+            div.hide();
+          });
+        });
+      } else {
+        img.attr("src", cat["url"]);
+        btn.removeClass("deleteButton");
+        if (cat["favourite"]) {
+          //change button to already in faves button
+          btn.addClass("alreadyFavedButton");
+          btn.removeClass("addFaveButton");
+          btn.("disabled", true);
+        } else {
+          //     change button to addFaves type**
+          btn.addClass("addFaveButton");
+          btn.removeClass("alreadyFavedButton");
+
+          btn.click(function() {
+            var settings = getSettings();
+            settings.url = "https://api.thecatapi.com/v1/favourites";
+            settings.method = "POST";
+            settings.data = "{\"image_id\":\"" + cat["id"] + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
+            $.ajax(settings)
+              .done(function(response) {
+                // TODO: inform them it's been added
+                btn.addClass("alreadyFavedButton");
+                btn.removeClass("addFaveButton");
+                btn.removeClass("deleteButton");
+                btn.attr("disabled", true);
+              })
+              .fail(function(xhr, ajaxOptions, thrownError) {
+                var error = JSON.parse(xhr.responseText);
+                if (error.message.includes("DUPLICATE_FAVOURITE")) {
+                  //TODO: tell them that it's already in there
+                  console.log("duplicate");
+                }
+              });
+          });
+        }
       }
     }
   }
@@ -201,24 +225,21 @@ $(document).ready(function() {
     var settings = getSettings();
     settings.method = "GET";
     settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + catLimit;
+    //delete this later
+    settings.url += "&order=asc";
     if (localStorage.userID) {
       settings.url += "&sub_id=" + localStorage.userID;
     }
 
     $.ajax(settings).done(function(response) {
       setDivs(response);
+      console.log(settings);
+      console.log(response);
     });
-  }
-
-  function formatFave(fave) {
-    var formattedFave = fave["image"];
-    formattedFave["fave_id"] = fave["id"]
-    return formattedFave;
   }
 
   function shuffleArray(inputArray, catLimit) {
     var outputArray = [];
-    var checkArray = [];
     var counter = 0;
 
     if (inputArray.length < catLimit) {
@@ -227,10 +248,8 @@ $(document).ready(function() {
 
     do {
       var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
-      if (jQuery.inArray(fave, checkArray) === -1) {
-        outputArray.push(formatFave(fave));
-        checkArray.push(fave);
-
+      if (jQuery.inArray(fave, outputArray) === -1) {
+        outputArray.push(fave);
         counter++;
       }
     } while (counter < catLimit);
@@ -252,7 +271,7 @@ $(document).ready(function() {
   }
 
   function getCatLimit() {
-    var catNumber = 15; //default is 10
+    var catNumber = 5; //default
     var numberInput = $("#catsNumberInput").val();
 
     if (numberInput > 0 && numberInput <= 100) {
@@ -268,112 +287,4 @@ $(document).ready(function() {
     $(".imageCard").height(dimensions);
     $(".imageCard").width(dimensions);
   }
-
-
-
-
-
-
-
-
-
-  //
-  // function getRandomCat() {
-  //   var settings = getSettings();
-  //   settings.url = "https://api.thecatapi.com/v1/images/search";
-  //   settings.method = "GET";
-  //
-  //   $.ajax(settings).done(function(response) {
-  //     var firstResponse = response[0];
-  //     $("#currentCat").attr("src", firstResponse["url"]);
-  //     $("#currentCat").attr("alt", firstResponse["id"]);
-  //   });
-  // }
-  //
-  // $("#newCatsButton").click(function() {
-  //   getRandomCat();
-  //   $("#currentCat").show();
-  //   $("#addToFavoritesButton").show();
-  //   $("#getFavoritesButton").show();
-  //   document.getElementById("favesList").innerHTML = "";
-  // });
-  //
-  // $("#addToFavoritesButton").click(function() {
-  //   var currentImageID = $("#currentCat").attr("alt");
-  //   var settings = getSettings();
-  //   settings.url = "https://api.thecatapi.com/v1/favourites";
-  //   settings.method = "POST";
-  //   settings.data = "{'image_id':'" + currentImageID + "','sub_id':'" + userID + "'}";
-  //
-  //   $.ajax(settings)
-  //     .done(function(response) {
-  //       //TODO: tell them that it's been added
-  //       getRandomCat();
-  //     })
-  //     .fail(function(xhr, ajaxOptions, thrownError) {
-  //       var error = JSON.parse(xhr.responseText);
-  //       if (error.message.includes("DUPLICATE_FAVOURITE")) {
-  //         //TODO: tell them that it's already in there
-  //         console.log("duplicate");
-  //       }
-  //     });
-  // });
-  //
-  // $("#getFavoritesButton").click(function() {
-  //   // TODO: shuffle the favorites`
-  //   var settings = getSettings();
-  //   settings.url = "https://api.thecatapi.com/v1/favourites?sub_id=" + userID;
-  //   settings.method = "GET";
-  //
-  //   $.ajax(settings).done(function(response) {
-  //     var favesList = document.getElementById("favesList");
-  //     favesList.innerHTML = "";
-  //     //set this so that it only works if there are favorites to show and the response was SUCCESSFUL
-  //     $("#currentCat").hide();
-  //     $("#addToFavoritesButton").hide();
-  //     $("#getFavoritesButton").hide();
-  //     for (i = 0; i < response.length; i++) {
-  //       var faveResponse = response[i];
-  //
-  //       var div = document.createElement("DIV");
-  //       div.classList.add("faveCard");
-  //       div.id = faveResponse["id"];
-  //       favesList.appendChild(div);
-  //
-  //       var btn = document.createElement("BUTTON");
-  //       btn.classList.add("deleteButton");
-  //       btn.innerHTML = "x";
-  //       div.appendChild(btn);
-  //
-  //       var img = document.createElement("IMG");
-  //       img.src = faveResponse["image"]["url"];
-  //       img.id = faveResponse["image_id"];
-  //       div.appendChild(img);
-  //
-  //     }
-  //
-  //     $(".deleteButton").hide();
-  //
-  //     $(".faveCard").mouseover(function(){
-  //       $(this).children(".deleteButton").show();
-  //     });
-  //
-  //     $(".faveCard").mouseout(function(){
-  //       $(this).children(".deleteButton").hide();
-  //     });
-  //
-  //     $(".deleteButton").click(function() {
-  //       var parentElement = $(this).parent();
-  //       parentElement.hide();
-  //       var deleteSettings = getSettings();
-  //       deleteSettings.url = "https://api.thecatapi.com/v1/favourites/" + parentElement.attr("id");
-  //       deleteSettings.method = "DELETE";
-  //       $.ajax(deleteSettings).done(function(response) {
-  //         // TODO: inform them of the deletion
-  //       });
-  //     });
-  //   });
-  // });
-
-
-})
+});

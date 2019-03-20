@@ -23,3 +23,7 @@ img {
 .addFaveButton {
   background-color: yellow;
 }
+
+.alreadyFavedButton {
+  background-color: orange;
+}
