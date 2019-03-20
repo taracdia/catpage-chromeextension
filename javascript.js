@@ -147,6 +147,7 @@ $(document).ready(function() {
     for (var i = 0; i < 100; i++) {
       var div = $("#multipleCatsDiv div").eq(i);
       if (i < array.length) {
+        div.show();
         changeDiv(div, array[i]);
       } else {
         div.hide();
@@ -161,7 +162,6 @@ $(document).ready(function() {
       div.hide();
       console.log("cat is undefined");
     } else {
-      div.show();
       var btn = div.children("button");
       var img = div.children("img");
 
@@ -187,7 +187,7 @@ $(document).ready(function() {
           //change button to already in faves button
           btn.addClass("alreadyFavedButton");
           btn.removeClass("addFaveButton");
-          btn.("disabled", true);
+          btn.attr("disabled", true);
         } else {
           //     change button to addFaves type**
           btn.addClass("addFaveButton");
