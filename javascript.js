@@ -1,9 +1,5 @@
 $(document).ready(function() {
-  /*
       // TODO: handle situation where they have no faves yet
-      // TODO: handle situation where they ask for more cat images than can be provided (because favorited too many (so get random can't get enough to exit the do while loop) or don't have enough favorites)
-      // TODO: handle duplicate clicks from waiting for load
-  */
   /*
   sub_id in API is userID in local storage
 
@@ -14,28 +10,40 @@ $(document).ready(function() {
   */
   //initial setup
   for (var i = 0; i < 100; i++) {
-    var div = $("<div class='imageCard'></div>");
-    // if (i === 0){
-    //   div.addClass("firstMultDiv");
-    // }
+    var div = $("<div></div>");
+    if (i === 0) {
+      div.attr("id", "firstMultDiv");
+    } else {
+      div.addClass("multiModeCard");
+    }
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
-    $("#multipleCatsDiv").append(div);
+    $("#catContainer").append(div);
     div.append(btn);
     div.append(img);
   }
 
   $(".imageButton").hide();
 
-  $(".imageCard").mouseover(function() {
+  $("#catContainer div").mouseover(function() {
     var btn = $(this).children("button");
     btn.show();
   });
 
-  $(".imageCard").mouseout(function() {
+  $("#catContainer div").mouseout(function() {
     var btn = $(this).children("button");
     btn.hide();
   });
+
+  // $("#buttonBar").css("visibility", "hidden");
+  //
+  // $(document).mouseover(function() {
+  //   $("#buttonBar").css("visibility", "visible");
+  // });
+  //
+  // $(document).mouseout(function() {
+  //   $("#buttonBar").css("visibility", "hidden");
+  // });
 
   //workaround to avoid code duplication and having to make a deep copy of an object
   function getSettings() {
@@ -65,12 +73,6 @@ $(document).ready(function() {
     });
   }
 
-  if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
-    multiMode();
-  } else {
-    singleMode();
-  }
-
   if (localStorage.numberOfCats) {
     $("#catsNumberInput").val(localStorage.numberOfCats);
   }
@@ -80,12 +82,17 @@ $(document).ready(function() {
   }
 
   if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
-    getFaveCats(getCatLimit());
+    getFaveCats();
   } else {
-    getRandomCats(getCatLimit());
+    getRandomCats();
   }
 
-  changeImageSize();
+  if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
+    multiMode();
+  } else {
+    singleMode();
+  }
+
   //-----temp-------
   $("#showCookies").click(function() {
     console.log("imageSize is " + localStorage.imageSize);
@@ -100,11 +107,15 @@ $(document).ready(function() {
   //-----temp------
   //--Listeners--
   $("#imageSizeSlider").change(function() {
+    console.log("duplicate");
+
     localStorage.imageSize = $("#imageSizeSlider").val();
     changeImageSize();
   });
 
   $("input[name=numberMode]:radio").change(function() {
+    console.log("duplicate");
+
     if ($("input[name='numberMode']:checked").val() === "one") {
       singleMode();
     } else {
@@ -112,7 +123,25 @@ $(document).ready(function() {
     }
   });
 
+  $("#getFavesButton").click(function() {
+    console.log("duplicate");
+
+    getFaveCats();
+  });
+
+  $("#newCatsButton").click(function() {
+    console.log("duplicate");
+
+    getRandomCats();
+  });
+  //-----------
+
   function singleMode() {
+    console.log("singleMode");
+
+    // if (!($("firstMultDiv").hasClass("occupied"))){
+    //   getFaveCats();
+    // }
     $("#getFavesButton").text("Get Fave");
     $("#newCatsButton").text("Get New Cat");
     localStorage.multipleBoolean = false;
@@ -120,11 +149,16 @@ $(document).ready(function() {
     $("input[name=numberMode][value=one]").prop("checked", true);
     $("#catsNumberInput").hide();
     $("#sliderContainer").hide();
-    $("#multipleCatsDiv").hide();
-    $("#singleCatDiv").show();
+
+    $("#firstMultDiv").removeClass("multiModeCard");
+    $("#firstMultDiv").removeAttr("style");
+    $(".multiModeCard").addClass("hidden");
   }
 
   function multiMode() {
+    console.log("multiMode");
+
+    changeImageSize();
     $("#getFavesButton").text("Get Faves");
     $("#newCatsButton").text("Get New Cats");
     localStorage.multipleBoolean = true;
@@ -132,67 +166,64 @@ $(document).ready(function() {
     $("input[name=numberMode][value=many]").prop("checked", true);
     $("#catsNumberInput").show();
     $("#sliderContainer").show();
-    $("#multipleCatsDiv").show();
-    $("#singleCatDiv").hide();
+
+    $("#firstMultDiv").addClass("multiModeCard");
+    $(".multiModeCard").removeClass("hidden");
   }
 
-  $("#getFavesButton").click(function() {
-    getFaveCats(getCatLimit());
-  });
-
-  $("#newCatsButton").click(function() {
-    getRandomCats(getCatLimit);
-  });
-
   function setDivs(array) {
-    changeDiv($("#singleCatDiv"), array[0]);
+    console.log("setDivs");
 
-    for (var i = 0; i < 100; i++) {
-      var div = $("#multipleCatsDiv div").eq(i);
-      if (i < array.length) {
-        div.show();
-        changeDiv(div, array[i]);
-      } else {
-        div.hide();
+    console.log(array);
+    // if (typeof array[0] === "undefined") {
+    //   alert("You don't have any favorites!");
+    //   getRandomCats();
+    // } else {
+      for (var i = 0; i < 100; i++) {
+        var div = $("#catContainer div").eq(i);
+        if (i < array.length) {
+          div.addClass("occupied");
+          changeDiv(div, array[i]);
+        } else {
+          div.removeClass("occupied");
+        }
       }
-    }
   }
 
   function changeDiv(div, cat) {
-    //if they hit the singleCatDiv button or the first multicatdiv button, will need to prevent them from hitting the button on the other one's side
-    //add already deleted button?
+    console.log("changeDiv");
+
     if (typeof cat === "undefined") {
-      div.hide();
-      console.log("cat is undefined");
+      //might be unnecessary now?
+      alert("cat is undefined");
     } else {
       var btn = div.children("button");
       var img = div.children("img");
 
+      btn.attr("disabled", false);
+
       if (cat["image"]) {
         img.attr("src", cat["image"]["url"]);
-        //     change button to delete type**
         btn.addClass("deleteButton");
-        btn.removeClass("addFaveButton");
-        btn.removeClass("deleteButton");
+        btn.removeClass("addFaveButton alreadyFavedButton");
         btn.click(function() {
           var settings = getSettings();
           settings.url = "https://api.thecatapi.com/v1/favourites/" + cat["id"];
           settings.method = "DELETE";
           $.ajax(settings).done(function(response) {
             // TODO: inform them of the deletion
-            div.hide();
+            // TODO: switch to addtofaves so they can undo deletion
+            // div.removeClass("occupied");
           });
         });
       } else {
         img.attr("src", cat["url"]);
         btn.removeClass("deleteButton");
         if (cat["favourite"]) {
-          //change button to already in faves button
           btn.addClass("alreadyFavedButton");
           btn.removeClass("addFaveButton");
           btn.attr("disabled", true);
         } else {
-          //     change button to addFaves type**
           btn.addClass("addFaveButton");
           btn.removeClass("alreadyFavedButton");
 
@@ -203,7 +234,7 @@ $(document).ready(function() {
             settings.data = "{\"image_id\":\"" + cat["id"] + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
             $.ajax(settings)
               .done(function(response) {
-                // TODO: inform them it's been added
+                //TODO: instead of alreadyFavedButton, let them delete the fave
                 btn.addClass("alreadyFavedButton");
                 btn.removeClass("addFaveButton");
                 btn.removeClass("deleteButton");
@@ -222,28 +253,30 @@ $(document).ready(function() {
     }
   }
 
-  function getRandomCats(catLimit) {
+  function getRandomCats() {
+    console.log("getRandomCats");
+
     localStorage.faveBoolean = false;
 
     var settings = getSettings();
     settings.method = "GET";
-    settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + catLimit;
+    settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + getCatLimit();
     //delete this later
-    settings.url += "&order=asc";
+    // settings.url += "&order=asc";
     if (localStorage.userID) {
       settings.url += "&sub_id=" + localStorage.userID;
     }
 
     $.ajax(settings).done(function(response) {
       setDivs(response);
-      console.log(settings);
-      console.log(response);
     });
   }
 
-  function shuffleArray(inputArray, catLimit) {
+  function shuffleArray(inputArray) {
+    console.log("shuffleArray");
     var outputArray = [];
     var counter = 0;
+    var catLimit = getCatLimit();
 
     if (inputArray.length < catLimit) {
       catLimit = inputArray.length;
@@ -260,7 +293,9 @@ $(document).ready(function() {
     return outputArray;
   }
 
-  function getFaveCats(catLimit) {
+  function getFaveCats() {
+    console.log("getFaveCats");
+
     localStorage.faveBoolean = true;
 
     var settings = getSettings();
@@ -268,15 +303,17 @@ $(document).ready(function() {
     settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
-      var faveArray = shuffleArray(response, catLimit);
-      setDivs(faveArray);
+      setDivs(shuffleArray(response));
     });
   }
 
   function getCatLimit() {
+    console.log("getCatLimit");
+
     var catNumber = 5; //default
     var numberInput = $("#catsNumberInput").val();
 
+    //API has a maximum of 100 per request
     if (numberInput > 0 && numberInput <= 100) {
       catNumber = numberInput;
     }
@@ -286,8 +323,10 @@ $(document).ready(function() {
   }
 
   function changeImageSize() {
+    console.log("changeImageSize");
+
     var dimensions = $("#imageSizeSlider").val();
-    $(".imageCard").height(dimensions);
-    $(".imageCard").width(dimensions);
+    $("#catContainer div").height(dimensions);
+    $("#catContainer div").width(dimensions);
   }
 });
