@@ -185,19 +185,20 @@ $(document).ready(function() {
   function setDivs(array) {
     console.log("setDivs");
 
-    /*
+    $(".imageButton").text("");
+
     if (typeof array[0] === "undefined") {
-      alert("You don't have any favorites!");
-      getRandomCats();
+      alert("set divs undefined");
     } else {
-    */
-    for (var i = 0; i < 100; i++) {
-      var div = $("#catContainer div").eq(i);
-      if (i < array.length) {
-        // div.addClass("occupied");
-        changeDiv(div, array[i]);
-      } else {
-        // div.removeClass("occupied");
+
+      for (var i = 0; i < 100; i++) {
+        var div = $("#catContainer div").eq(i);
+        if (i < array.length) {
+          // div.addClass("occupied");
+          changeDiv(div, array[i]);
+        } else {
+          // div.removeClass("occupied");
+        }
       }
     }
   }
@@ -210,8 +211,16 @@ $(document).ready(function() {
     settings.method = "DELETE";
     $.ajax(settings).done(function(response) {
       // button.removeClass("deleteButton");
+      button.text("add");
+      //try using toggleClass
       console.log(response);
+      button.off("click");
+      button.click(function(){
+        addFaveButtonOnClick(button, imageID);
+      });
       // TODO: switch to addtofaves so they can undo deletion
+      //remove the button's onclick method then add the new one
+
     });
   }
 
@@ -224,7 +233,13 @@ $(document).ready(function() {
     settings.data = "{\"image_id\":\"" + imageID + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
     $.ajax(settings)
       .done(function(response) {
+        button.text("del");
         console.log(response);
+        // TODO: change to delete version
+        button.off("click");
+        button.click(function(){
+          deleteButtonOnClick(button, response["id"], imageID);
+        });
       })
       .fail(function(xhr, ajaxOptions, thrownError) {
         var error = JSON.parse(xhr.responseText);
@@ -244,14 +259,13 @@ $(document).ready(function() {
     } else {
       var btn = div.children("button");
       var img = div.children("img");
-      btn.off('click');
+      btn.off("click");
 
       if (cat["image"]) {
         btn.text("del");
         /*
         img.attr("src", cat["image"]["url"]);
-        btn.addClass("deleteButton");
-        btn.removeClass("addFaveButton");
+        btn.addClass("deleteButton").removeClass("addFaveButton");
         */
 
         btn.click(function() {
@@ -259,6 +273,7 @@ $(document).ready(function() {
         });
       } else if (cat["favourite"]) {
         btn.text("already added");
+        // btn.addClass("deleteButton").removeClass("addFaveButton");
         btn.click(function() {
           deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
         });
@@ -266,8 +281,7 @@ $(document).ready(function() {
         btn.text("add");
         /*
         img.attr("src", cat["url"]);
-        btn.removeClass("deleteButton");
-        btn.addClass("addFaveButton");
+        btn.removeClass("deleteButton").addClass("addFaveButton");
         */
         btn.click(function() {
           addFaveButtonOnClick($(this), cat["id"]);
@@ -293,6 +307,7 @@ $(document).ready(function() {
     }
 
     $.ajax(settings).done(function(response) {
+      // TODO: handle empty array
       console.log(response);
       setDivs(response);
     });
@@ -331,8 +346,13 @@ $(document).ready(function() {
     settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
+      // TODO: handle empty array
       console.log(response);
-      setDivs(shuffleArray(response));
+      if (response.length === 0) {
+        alert("empty response from getFaveCats");
+      } else {
+        setDivs(shuffleArray(response));
+      }
     });
   }
 
