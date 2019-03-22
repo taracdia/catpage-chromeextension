@@ -1,4 +1,5 @@
 $(document).ready(function() {
+  const REQUEST_LIMIT = 100; //maximum length of the Get responses from the API
   /*
   sub_id in API is userID in local storage
 
@@ -8,14 +9,14 @@ $(document).ready(function() {
     set: the user's ID
   */
   //initial setup
-  for (var i = 0; i < 100; i++) {
+  for (var i = 0; i < REQUEST_LIMIT; i++) {
     var div = $("<div></div>");
     if (i === 0) {
       div.attr("id", "firstMultDiv");
     }
     div.addClass("multiModeCard");
     //-----temp------
-    div.addClass("div" + i)
+    div.addClass("div" + i);
     //-----temp------
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
@@ -184,11 +185,57 @@ $(document).ready(function() {
   function setDivs(array) {
     console.log("setDivs");
 
-    if (typeof array[0] === "undefined") {
-      alert("set divs undefined");
+    for (var i = 0; i < REQUEST_LIMIT; i++) {
+      changeDiv($("#catContainer div").eq(i), array[i]);
+    }
+  }
+
+  function changeDiv(div, cat) {
+    console.log("changeDiv");
+
+    var btn = div.children("button");
+    var img = div.children("img");
+    btn.off("click");
+
+    if (typeof cat === "undefined") {
+      //wipe the div
+      div.removeClass("occupied");
+      img.removeAttr("src");
+      btn
+        .text("")
+        .removeClass("deleteButton addFaveButton");
     } else {
-      for (var i = 0; i < 100; i++) {
-        changeDiv($("#catContainer div").eq(i), array[i]);
+      div.addClass("occupied");
+      if (cat["image"]) {
+        img.attr("src", cat["image"]["url"]);
+
+        btn
+          .text("del")
+          .addClass("deleteButton")
+          .removeClass("addFaveButton")
+          .click(function() {
+            deleteButtonOnClick($(this), cat["id"], cat["image"]["id"]);
+          });
+      } else if (cat["favourite"]) {
+        img.attr("src", cat["url"]);
+
+        btn
+          .text("already added")
+          .addClass("deleteButton")
+          .removeClass("addFaveButton")
+          .click(function() {
+            deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
+          });
+      } else {
+        img.attr("src", cat["url"]);
+
+        btn
+          .text("add")
+          .addClass("addFaveButton")
+          .removeClass("deleteButton")
+          .click(function() {
+            addFaveButtonOnClick($(this), cat["id"]);
+          });
       }
     }
   }
@@ -200,14 +247,15 @@ $(document).ready(function() {
     settings.url = "https://api.thecatapi.com/v1/favourites/" + faveID;
     settings.method = "DELETE";
     $.ajax(settings).done(function(response) {
-      // button.removeClass("deleteButton");
-      button.text("add");
-      //try using toggleClass
       console.log(response);
-      button.off("click");
-      button.click(function() {
-        addFaveButtonOnClick(button, imageID);
-      });
+
+      button
+        .text("add")
+        .toggleClass("deleteButton addFaveButton")
+        .off("click")
+        .click(function() {
+          addFaveButtonOnClick(button, imageID);
+        });
     });
   }
 
@@ -220,68 +268,16 @@ $(document).ready(function() {
     settings.data = "{\"image_id\":\"" + imageID + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
     $.ajax(settings)
       .done(function(response) {
-        button.text("del");
         console.log(response);
-        button.off("click");
-        button.click(function() {
-          deleteButtonOnClick(button, response["id"], imageID);
-        });
-      })
-      .fail(function(xhr, ajaxOptions, thrownError) {
-        var error = JSON.parse(xhr.responseText);
-        if (error.message.includes("DUPLICATE_FAVOURITE")) {
-          //TODO: tell them that it's already in there
-          alert("duplicate");
-        }
+
+        button
+          .text("del")
+          .toggleClass("deleteButton addFaveButton")
+          .off("click")
+          .click(function() {
+            deleteButtonOnClick(button, response["id"], imageID);
+          });
       });
-  }
-
-  function changeDiv(div, cat) {
-    console.log("changeDiv");
-
-    var btn = div.children("button");
-    var img = div.children("img");
-    btn.off("click");
-
-    if (typeof cat === "undefined") {
-      //wipe the div
-      img.removeAttr("src");
-      btn.text("")
-      //btn.removeClass("deleteButton addFaveButton");
-      // div.removeClass("occupied");
-
-    } else {
-      // div.addClass("occupied");
-      if (cat["image"]) {
-        btn.text("del");
-
-        img.attr("src", cat["image"]["url"]);
-        // btn.addClass("deleteButton").removeClass("addFaveButton");
-
-
-        btn.click(function() {
-          deleteButtonOnClick($(this), cat["id"], cat["image"]["id"]);
-        });
-      } else if (cat["favourite"]) {
-        btn.text("already added");
-        img.attr("src", cat["url"]);
-
-        // btn.addClass("deleteButton").removeClass("addFaveButton");
-        btn.click(function() {
-          deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
-        });
-      } else {
-        btn.text("add");
-
-        img.attr("src", cat["url"]);
-        // btn.removeClass("deleteButton").addClass("addFaveButton");
-
-        btn.click(function() {
-          addFaveButtonOnClick($(this), cat["id"]);
-        });
-
-      }
-    }
   }
 
   function getRandomCats() {
@@ -355,11 +351,10 @@ $(document).ready(function() {
   function getCatLimit() {
     //console.log("getCatLimit");
 
-    // var catNumber = 30; //default
+    // var catNumber = 20; //default
     // var numberInput = $("#catsNumberInput").val();
     //
-    // //API has a maximum of 100 per request
-    // if (numberInput > 0 && numberInput <= 100) {
+    // if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
     //   catNumber = numberInput;
     // }
     //
