@@ -1,5 +1,5 @@
 $(document).ready(function() {
-      // TODO: handle situation where they have no faves yet
+  // TODO: handle situation where they have no faves yet
   /*
   sub_id in API is userID in local storage
 
@@ -13,15 +13,19 @@ $(document).ready(function() {
     var div = $("<div></div>");
     if (i === 0) {
       div.attr("id", "firstMultDiv");
-    } else {
-      div.addClass("multiModeCard");
     }
+    div.addClass("multiModeCard");
+    //-----temp------
+    div.addClass("div" + i)
+    //-----temp------
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
     $("#catContainer").append(div);
     div.append(btn);
     div.append(img);
   }
+
+  /*
 
   $(".imageButton").hide();
 
@@ -35,15 +39,16 @@ $(document).ready(function() {
     btn.hide();
   });
 
-  // $("#buttonBar").css("visibility", "hidden");
-  //
-  // $(document).mouseover(function() {
-  //   $("#buttonBar").css("visibility", "visible");
-  // });
-  //
-  // $(document).mouseout(function() {
-  //   $("#buttonBar").css("visibility", "hidden");
-  // });
+  $("#buttonBar").css("visibility", "hidden");
+
+  $(document).mouseover(function() {
+    $("#buttonBar").css("visibility", "visible");
+  });
+
+  $(document).mouseout(function() {
+    $("#buttonBar").css("visibility", "hidden");
+  });
+  */
 
   //workaround to avoid code duplication and having to make a deep copy of an object
   function getSettings() {
@@ -72,7 +77,7 @@ $(document).ready(function() {
       }
     });
   }
-
+  /*
   if (localStorage.numberOfCats) {
     $("#catsNumberInput").val(localStorage.numberOfCats);
   }
@@ -93,6 +98,8 @@ $(document).ready(function() {
     singleMode();
   }
 
+  */
+
   //-----temp-------
   $("#showCookies").click(function() {
     console.log("imageSize is " + localStorage.imageSize);
@@ -106,15 +113,17 @@ $(document).ready(function() {
   })
   //-----temp------
   //--Listeners--
+  /*
   $("#imageSizeSlider").change(function() {
-    console.log("duplicate");
+    //console.log("slider changed");
 
     localStorage.imageSize = $("#imageSizeSlider").val();
     changeImageSize();
   });
 
+
   $("input[name=numberMode]:radio").change(function() {
-    console.log("duplicate");
+    //console.log("radio changed to " + $("input[name='numberMode']:checked").val());
 
     if ($("input[name='numberMode']:checked").val() === "one") {
       singleMode();
@@ -122,22 +131,23 @@ $(document).ready(function() {
       multiMode();
     }
   });
+  */
 
   $("#getFavesButton").click(function() {
-    console.log("duplicate");
+    //console.log("getFavesButton click");
 
     getFaveCats();
   });
 
   $("#newCatsButton").click(function() {
-    console.log("duplicate");
+    //console.log("newCatsButton click");
 
     getRandomCats();
   });
   //-----------
-
+  /*
   function singleMode() {
-    console.log("singleMode");
+    //console.log("singleMode");
 
     // if (!($("firstMultDiv").hasClass("occupied"))){
     //   getFaveCats();
@@ -156,7 +166,7 @@ $(document).ready(function() {
   }
 
   function multiMode() {
-    console.log("multiMode");
+    //console.log("multiMode");
 
     changeImageSize();
     $("#getFavesButton").text("Get Faves");
@@ -170,24 +180,59 @@ $(document).ready(function() {
     $("#firstMultDiv").addClass("multiModeCard");
     $(".multiModeCard").removeClass("hidden");
   }
+  */
 
   function setDivs(array) {
     console.log("setDivs");
 
-    console.log(array);
-    // if (typeof array[0] === "undefined") {
-    //   alert("You don't have any favorites!");
-    //   getRandomCats();
-    // } else {
-      for (var i = 0; i < 100; i++) {
-        var div = $("#catContainer div").eq(i);
-        if (i < array.length) {
-          div.addClass("occupied");
-          changeDiv(div, array[i]);
-        } else {
-          div.removeClass("occupied");
-        }
+    /*
+    if (typeof array[0] === "undefined") {
+      alert("You don't have any favorites!");
+      getRandomCats();
+    } else {
+    */
+    for (var i = 0; i < 100; i++) {
+      var div = $("#catContainer div").eq(i);
+      if (i < array.length) {
+        // div.addClass("occupied");
+        changeDiv(div, array[i]);
+      } else {
+        // div.removeClass("occupied");
       }
+    }
+  }
+
+  function deleteButtonOnClick(button, faveID, imageID) {
+    console.log("deleteButtonOnClick");
+
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/favourites/" + faveID;
+    settings.method = "DELETE";
+    $.ajax(settings).done(function(response) {
+      // button.removeClass("deleteButton");
+      console.log(response);
+      // TODO: switch to addtofaves so they can undo deletion
+    });
+  }
+
+  function addFaveButtonOnClick(button, imageID) {
+    console.log("addFaveButtonOnClick");
+
+    var settings = getSettings();
+    settings.url = "https://api.thecatapi.com/v1/favourites";
+    settings.method = "POST";
+    settings.data = "{\"image_id\":\"" + imageID + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
+    $.ajax(settings)
+      .done(function(response) {
+        console.log(response);
+      })
+      .fail(function(xhr, ajaxOptions, thrownError) {
+        var error = JSON.parse(xhr.responseText);
+        if (error.message.includes("DUPLICATE_FAVOURITE")) {
+          //TODO: tell them that it's already in there
+          console.log("duplicate");
+        }
+      });
   }
 
   function changeDiv(div, cat) {
@@ -199,56 +244,35 @@ $(document).ready(function() {
     } else {
       var btn = div.children("button");
       var img = div.children("img");
-
-      btn.attr("disabled", false);
+      btn.off('click');
 
       if (cat["image"]) {
+        btn.text("del");
+        /*
         img.attr("src", cat["image"]["url"]);
         btn.addClass("deleteButton");
-        btn.removeClass("addFaveButton alreadyFavedButton");
+        btn.removeClass("addFaveButton");
+        */
+
         btn.click(function() {
-          var settings = getSettings();
-          settings.url = "https://api.thecatapi.com/v1/favourites/" + cat["id"];
-          settings.method = "DELETE";
-          $.ajax(settings).done(function(response) {
-            // TODO: inform them of the deletion
-            // TODO: switch to addtofaves so they can undo deletion
-            // div.removeClass("occupied");
-          });
+          deleteButtonOnClick($(this), cat["id"], cat["image"]["id"]);
+        });
+      } else if (cat["favourite"]) {
+        btn.text("already added");
+        btn.click(function() {
+          deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
         });
       } else {
+        btn.text("add");
+        /*
         img.attr("src", cat["url"]);
         btn.removeClass("deleteButton");
-        if (cat["favourite"]) {
-          btn.addClass("alreadyFavedButton");
-          btn.removeClass("addFaveButton");
-          btn.attr("disabled", true);
-        } else {
-          btn.addClass("addFaveButton");
-          btn.removeClass("alreadyFavedButton");
+        btn.addClass("addFaveButton");
+        */
+        btn.click(function() {
+          addFaveButtonOnClick($(this), cat["id"]);
+        });
 
-          btn.click(function() {
-            var settings = getSettings();
-            settings.url = "https://api.thecatapi.com/v1/favourites";
-            settings.method = "POST";
-            settings.data = "{\"image_id\":\"" + cat["id"] + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
-            $.ajax(settings)
-              .done(function(response) {
-                //TODO: instead of alreadyFavedButton, let them delete the fave
-                btn.addClass("alreadyFavedButton");
-                btn.removeClass("addFaveButton");
-                btn.removeClass("deleteButton");
-                btn.attr("disabled", true);
-              })
-              .fail(function(xhr, ajaxOptions, thrownError) {
-                var error = JSON.parse(xhr.responseText);
-                if (error.message.includes("DUPLICATE_FAVOURITE")) {
-                  //TODO: tell them that it's already in there
-                  console.log("duplicate");
-                }
-              });
-          });
-        }
       }
     }
   }
@@ -256,77 +280,83 @@ $(document).ready(function() {
   function getRandomCats() {
     console.log("getRandomCats");
 
-    localStorage.faveBoolean = false;
+    // localStorage.faveBoolean = false;
 
     var settings = getSettings();
     settings.method = "GET";
     settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + getCatLimit();
-    //delete this later
-    // settings.url += "&order=asc";
+    //-----temp------
+    settings.url += "&order=asc";
+    //-----temp------
     if (localStorage.userID) {
       settings.url += "&sub_id=" + localStorage.userID;
     }
 
     $.ajax(settings).done(function(response) {
+      console.log(response);
       setDivs(response);
     });
   }
 
   function shuffleArray(inputArray) {
-    console.log("shuffleArray");
-    var outputArray = [];
-    var counter = 0;
-    var catLimit = getCatLimit();
+    //console.log("shuffleArray");
 
-    if (inputArray.length < catLimit) {
-      catLimit = inputArray.length;
-    }
-
-    do {
-      var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
-      if (jQuery.inArray(fave, outputArray) === -1) {
-        outputArray.push(fave);
-        counter++;
-      }
-    } while (counter < catLimit);
-
-    return outputArray;
+    // var outputArray = [];
+    // var counter = 0;
+    // var catLimit = getCatLimit();
+    //
+    // if (inputArray.length < catLimit) {
+    //   catLimit = inputArray.length;
+    // }
+    //
+    // do {
+    //   var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
+    //   if (jQuery.inArray(fave, outputArray) === -1) {
+    //     outputArray.push(fave);
+    //     counter++;
+    //   }
+    // } while (counter < catLimit);
+    //
+    // return outputArray;
+    return inputArray;
   }
 
   function getFaveCats() {
     console.log("getFaveCats");
 
-    localStorage.faveBoolean = true;
+    // localStorage.faveBoolean = true;
 
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites?sub_id=" + localStorage.userID;
     settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
+      console.log(response);
       setDivs(shuffleArray(response));
     });
   }
 
   function getCatLimit() {
-    console.log("getCatLimit");
+    //console.log("getCatLimit");
 
-    var catNumber = 5; //default
-    var numberInput = $("#catsNumberInput").val();
-
-    //API has a maximum of 100 per request
-    if (numberInput > 0 && numberInput <= 100) {
-      catNumber = numberInput;
-    }
-
-    localStorage.numberOfCats = catNumber;
-    return catNumber;
+    // var catNumber = 30; //default
+    // var numberInput = $("#catsNumberInput").val();
+    //
+    // //API has a maximum of 100 per request
+    // if (numberInput > 0 && numberInput <= 100) {
+    //   catNumber = numberInput;
+    // }
+    //
+    // localStorage.numberOfCats = catNumber;
+    // return catNumber;
+    return 30;
   }
 
   function changeImageSize() {
-    console.log("changeImageSize");
+    //console.log("changeImageSize");
 
-    var dimensions = $("#imageSizeSlider").val();
-    $("#catContainer div").height(dimensions);
-    $("#catContainer div").width(dimensions);
+    // var dimensions = $("#imageSizeSlider").val();
+    // $("#catContainer div").height(dimensions);
+    // $("#catContainer div").width(dimensions);
   }
 });
