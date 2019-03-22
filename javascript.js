@@ -1,5 +1,4 @@
 $(document).ready(function() {
-  // TODO: handle situation where they have no faves yet
   /*
   sub_id in API is userID in local storage
 
@@ -185,22 +184,11 @@ $(document).ready(function() {
   function setDivs(array) {
     console.log("setDivs");
 
-    $(".imageButton").text("");
-
     if (typeof array[0] === "undefined") {
       alert("set divs undefined");
     } else {
-
       for (var i = 0; i < 100; i++) {
-        var div = $("#catContainer div").eq(i);
-        if (i < array.length) {
-          // div.addClass("occupied");
-          changeDiv(div, array[i]);
-        } else {
-          //wipe the div
-          // div.removeClass("occupied");
-          div.children("img").removeAttr("src");
-        }
+        changeDiv($("#catContainer div").eq(i), array[i]);
       }
     }
   }
@@ -217,7 +205,7 @@ $(document).ready(function() {
       //try using toggleClass
       console.log(response);
       button.off("click");
-      button.click(function(){
+      button.click(function() {
         addFaveButtonOnClick(button, imageID);
       });
     });
@@ -235,7 +223,7 @@ $(document).ready(function() {
         button.text("del");
         console.log(response);
         button.off("click");
-        button.click(function(){
+        button.click(function() {
           deleteButtonOnClick(button, response["id"], imageID);
         });
       })
@@ -251,14 +239,19 @@ $(document).ready(function() {
   function changeDiv(div, cat) {
     console.log("changeDiv");
 
-    if (typeof cat === "undefined") {
-      //might be unnecessary now?
-      alert("cat is undefined");
-    } else {
-      var btn = div.children("button");
-      var img = div.children("img");
-      btn.off("click");
+    var btn = div.children("button");
+    var img = div.children("img");
+    btn.off("click");
 
+    if (typeof cat === "undefined") {
+      //wipe the div
+      img.removeAttr("src");
+      btn.text("")
+      //btn.removeClass("deleteButton addFaveButton");
+      // div.removeClass("occupied");
+
+    } else {
+      // div.addClass("occupied");
       if (cat["image"]) {
         btn.text("del");
 
