@@ -134,13 +134,13 @@ $(document).ready(function() {
   */
 
   $("#getFavesButton").click(function() {
-    //console.log("getFavesButton click");
+    console.log("getFavesButton click");
 
     getFaveCats();
   });
 
   $("#newCatsButton").click(function() {
-    //console.log("newCatsButton click");
+    console.log("newCatsButton click");
 
     getRandomCats();
   });
@@ -372,7 +372,7 @@ $(document).ready(function() {
     //
     // localStorage.numberOfCats = catNumber;
     // return catNumber;
-    return 30;
+    return 5;
   }
 
   function changeImageSize() {
