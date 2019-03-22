@@ -197,7 +197,9 @@ $(document).ready(function() {
           // div.addClass("occupied");
           changeDiv(div, array[i]);
         } else {
+          //wipe the div
           // div.removeClass("occupied");
+          div.children("img").removeAttr("src");
         }
       }
     }
@@ -218,9 +220,6 @@ $(document).ready(function() {
       button.click(function(){
         addFaveButtonOnClick(button, imageID);
       });
-      // TODO: switch to addtofaves so they can undo deletion
-      //remove the button's onclick method then add the new one
-
     });
   }
 
@@ -235,7 +234,6 @@ $(document).ready(function() {
       .done(function(response) {
         button.text("del");
         console.log(response);
-        // TODO: change to delete version
         button.off("click");
         button.click(function(){
           deleteButtonOnClick(button, response["id"], imageID);
@@ -245,7 +243,7 @@ $(document).ready(function() {
         var error = JSON.parse(xhr.responseText);
         if (error.message.includes("DUPLICATE_FAVOURITE")) {
           //TODO: tell them that it's already in there
-          console.log("duplicate");
+          alert("duplicate");
         }
       });
   }
@@ -263,26 +261,28 @@ $(document).ready(function() {
 
       if (cat["image"]) {
         btn.text("del");
-        /*
+
         img.attr("src", cat["image"]["url"]);
-        btn.addClass("deleteButton").removeClass("addFaveButton");
-        */
+        // btn.addClass("deleteButton").removeClass("addFaveButton");
+
 
         btn.click(function() {
           deleteButtonOnClick($(this), cat["id"], cat["image"]["id"]);
         });
       } else if (cat["favourite"]) {
         btn.text("already added");
+        img.attr("src", cat["url"]);
+
         // btn.addClass("deleteButton").removeClass("addFaveButton");
         btn.click(function() {
           deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
         });
       } else {
         btn.text("add");
-        /*
+
         img.attr("src", cat["url"]);
-        btn.removeClass("deleteButton").addClass("addFaveButton");
-        */
+        // btn.removeClass("deleteButton").addClass("addFaveButton");
+
         btn.click(function() {
           addFaveButtonOnClick($(this), cat["id"]);
         });
@@ -307,9 +307,13 @@ $(document).ready(function() {
     }
 
     $.ajax(settings).done(function(response) {
-      // TODO: handle empty array
       console.log(response);
-      setDivs(response);
+
+      if (response.length === 0) {
+        alert("empty response from getRandomCats");
+      } else {
+        setDivs(response);
+      }
     });
   }
 
@@ -346,7 +350,6 @@ $(document).ready(function() {
     settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
-      // TODO: handle empty array
       console.log(response);
       if (response.length === 0) {
         alert("empty response from getFaveCats");
