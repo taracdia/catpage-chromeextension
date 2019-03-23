@@ -14,9 +14,9 @@ img {
   /* singleCat's setting */
 }
 
-/* #catContainer div:not(.occupied), .hidden {
+#catContainer div:not(.occupied), .hidden {
   display: none;
-} */
+}
 
 #firstMultDiv {
   border-color: red;
@@ -32,8 +32,4 @@ img {
 
 .addFaveButton {
   background-color: yellow;
-}
-
-.hidden {
-  display: none;
 }

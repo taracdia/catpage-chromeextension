@@ -5,14 +5,10 @@ $(document).ready(function() {
 
   //initial setup
   for (var i = 0; i < REQUEST_LIMIT; i++) {
-    var div = $("<div></div>");
+    var div = $("<div class='multiModeCard'></div>");
     if (i === 0) {
       div.attr("id", "firstMultDiv");
     }
-    div.addClass("multiModeCard");
-    //-----temp------
-    div.addClass("div" + i);
-    //-----temp------
     var btn = $("<button class='imageButton'>+</button>");
     var img = $("<img>");
     $("#catContainer").append(div);
@@ -23,23 +19,11 @@ $(document).ready(function() {
   $(".imageButton").hide();
 
   $("#catContainer div").mouseover(function() {
-    var btn = $(this).children("button");
-    btn.show();
+    $(this).children("button").show();
   });
 
   $("#catContainer div").mouseout(function() {
-    var btn = $(this).children("button");
-    btn.hide();
-  });
-
-  $("#buttonBar").css("visibility", "hidden");
-
-  $(document).mouseover(function() {
-    $("#buttonBar").css("visibility", "visible");
-  });
-
-  $(document).mouseout(function() {
-    $("#buttonBar").css("visibility", "hidden");
+    $(this).children("button").hide();
   });
 
   //workaround to avoid code duplication and having to make a deep copy of an object
