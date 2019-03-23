@@ -1,3 +1,7 @@
+body {
+  background-image: url("background.png");
+}
+
 img {
   max-width: 100%;
   max-height: 100%;
@@ -8,6 +12,7 @@ img {
   height: 200px;
   width: 200px;
   border-style: solid;
+  border-radius: 5px;
 }
 
 #catContainer div{
@@ -18,12 +23,16 @@ img {
   display: none;
 }
 
-#firstMultDiv {
-  border-color: red;
-}
-
 .imageButton {
   position: absolute;
+  border-radius: 25px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  font-size: 20px;
+  height: 30px;
+  width: 30px;
+  line-height: 18px;
 }
 
 .deleteButton {
@@ -31,5 +40,5 @@ img {
 }
 
 .addFaveButton {
-  background-color: yellow;
+  background-color: green;
 }

@@ -9,21 +9,29 @@ $(document).ready(function() {
     if (i === 0) {
       div.attr("id", "firstMultDiv");
     }
-    var btn = $("<button class='imageButton'>+</button>");
-    var img = $("<img>");
     $("#catContainer").append(div);
-    div.append(btn);
-    div.append(img);
+    div.append($("<button class='imageButton'>+</button>"));
+    div.append($("<img>"));
   }
 
   $(".imageButton").hide();
 
   $("#catContainer div").mouseover(function() {
-    $(this).children("button").show();
+    $(this).children("button").show()
   });
 
   $("#catContainer div").mouseout(function() {
-    $(this).children("button").hide();
+    $(this).children("button").hide()
+  });
+
+  $("#buttonBar").hide();
+
+  $(document).mouseover(function() {
+    $("#buttonBar").show()
+  });
+
+  $(document).mouseout(function() {
+    $("#buttonBar").hide()
   });
 
   //workaround to avoid code duplication and having to make a deep copy of an object
@@ -143,7 +151,6 @@ $(document).ready(function() {
     $(".multiModeCard").removeClass("hidden");
   }
 
-
   function setDivs(array) {
     console.log("setDivs");
 
@@ -172,7 +179,7 @@ $(document).ready(function() {
         img.attr("src", cat["image"]["url"]);
 
         btn
-          .text("del")
+          .text("X")
           .addClass("deleteButton")
           .removeClass("addFaveButton")
           .click(function() {
@@ -182,7 +189,7 @@ $(document).ready(function() {
         img.attr("src", cat["url"]);
 
         btn
-          .text("already added")
+          .text("X")
           .addClass("deleteButton")
           .removeClass("addFaveButton")
           .click(function() {
@@ -192,7 +199,7 @@ $(document).ready(function() {
         img.attr("src", cat["url"]);
 
         btn
-          .text("add")
+          .text("+")
           .addClass("addFaveButton")
           .removeClass("deleteButton")
           .click(function() {
@@ -208,17 +215,19 @@ $(document).ready(function() {
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites/" + faveID;
     settings.method = "DELETE";
-    $.ajax(settings).done(function(response) {
-      console.log(response);
+    $.ajax(settings)
+      .done(function(response) {
+        console.log(response);
 
-      button
-        .text("add")
-        .toggleClass("deleteButton addFaveButton")
-        .off("click")
-        .click(function() {
-          addFaveButtonOnClick(button, imageID);
-        });
-    });
+        button
+          .text("+")
+          .toggleClass("deleteButton addFaveButton")
+          .off("click")
+          .click(function() {
+            addFaveButtonOnClick(button, imageID);
+          });
+      })
+      .fail(handleAjaxErrors);
   }
 
   function addFaveButtonOnClick(button, imageID) {
@@ -227,19 +236,32 @@ $(document).ready(function() {
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites";
     settings.method = "POST";
-    settings.data = JSON.stringify({"image_id": imageID, "sub_id": localStorage.userID});
+    settings.data = JSON.stringify({
+      "image_id": imageID,
+      "sub_id": localStorage.userID
+    });
     $.ajax(settings)
       .done(function(response) {
         console.log(response);
 
         button
-          .text("del")
+          .text("X")
           .toggleClass("deleteButton addFaveButton")
           .off("click")
           .click(function() {
             deleteButtonOnClick(button, response["id"], imageID);
           });
-      });
+      })
+      .fail(handleAjaxErrors);
+  }
+
+  function handleAjaxErrors() {
+    alert("Warning: editing in multiple tabs at once can have unexpected results!");
+    if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
+      getFaveCats();
+    } else {
+      getRandomCats();
+    }
   }
 
   function getRandomCats() {
@@ -250,9 +272,6 @@ $(document).ready(function() {
     var settings = getSettings();
     settings.method = "GET";
     settings.url = "https://api.thecatapi.com/v1/images/search?limit=" + getCatLimit();
-    //-----temp------
-    settings.url += "&order=asc";
-    //-----temp------
     if (localStorage.userID) {
       settings.url += "&sub_id=" + localStorage.userID;
     }
@@ -311,7 +330,6 @@ $(document).ready(function() {
 
     var catNumber = 20; //default
     var numberInput = $("#catsNumberInput").val();
-
     if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
       catNumber = numberInput;
     }
