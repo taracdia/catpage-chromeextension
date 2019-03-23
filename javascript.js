@@ -106,17 +106,9 @@ $(document).ready(function() {
   });
 
 
-  $("#getFavesButton").click(function() {
-    console.log("getFavesButton click");
+  $("#getFavesButton").click(getFaveCats);
 
-    getFaveCats();
-  });
-
-  $("#newCatsButton").click(function() {
-    console.log("newCatsButton click");
-
-    getRandomCats();
-  });
+  $("#newCatsButton").click(getRandomCats);
   //-----------
 
   function singleMode() {
@@ -268,11 +260,7 @@ $(document).ready(function() {
     $.ajax(settings).done(function(response) {
       console.log(response);
 
-      if (response.length === 0) {
-        alert("empty response from getRandomCats");
-      } else {
-        setDivs(response);
-      }
+      setDivs(response);
     });
   }
 
@@ -310,7 +298,8 @@ $(document).ready(function() {
     $.ajax(settings).done(function(response) {
       console.log(response);
       if (response.length === 0) {
-        alert("empty response from getFaveCats");
+        alert("You don't have any favorites!");
+        getRandomCats();
       } else {
         setDivs(shuffleArray(response));
       }
