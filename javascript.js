@@ -1,13 +1,8 @@
 $(document).ready(function() {
   const REQUEST_LIMIT = 100; //maximum length of the Get responses from the API
-  /*
-  sub_id in API is userID in local storage
+  
+  //sub_id in API is userID in local storage
 
-  userID has three modes: unset, empty, and set
-    unset: undefined. Means that the user has not used the extension while signed in to chrome
-    empty: empty string. Means user is not logged in to Chrome
-    set: the user's ID
-  */
   //initial setup
   for (var i = 0; i < REQUEST_LIMIT; i++) {
     var div = $("<div></div>");
@@ -283,7 +278,7 @@ $(document).ready(function() {
   function getRandomCats() {
     console.log("getRandomCats");
 
-    // localStorage.faveBoolean = false;
+    localStorage.faveBoolean = false;
 
     var settings = getSettings();
     settings.method = "GET";
@@ -307,32 +302,32 @@ $(document).ready(function() {
   }
 
   function shuffleArray(inputArray) {
-    //console.log("shuffleArray");
+    console.log("shuffleArray");
 
-    // var outputArray = [];
-    // var counter = 0;
-    // var catLimit = getCatLimit();
-    //
-    // if (inputArray.length < catLimit) {
-    //   catLimit = inputArray.length;
-    // }
-    //
-    // do {
-    //   var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
-    //   if (jQuery.inArray(fave, outputArray) === -1) {
-    //     outputArray.push(fave);
-    //     counter++;
-    //   }
-    // } while (counter < catLimit);
-    //
-    // return outputArray;
-    return inputArray;
+    var outputArray = [];
+    var counter = 0;
+    var catLimit = getCatLimit();
+
+    if (inputArray.length < catLimit) {
+      catLimit = inputArray.length;
+    }
+
+    do {
+      var fave = inputArray[Math.floor(Math.random() * inputArray.length)];
+      if (jQuery.inArray(fave, outputArray) === -1) {
+        outputArray.push(fave);
+        counter++;
+      }
+    } while (counter < catLimit);
+
+    return outputArray;
+    // return inputArray;
   }
 
   function getFaveCats() {
     console.log("getFaveCats");
 
-    // localStorage.faveBoolean = true;
+    localStorage.faveBoolean = true;
 
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites?sub_id=" + localStorage.userID;
@@ -349,23 +344,23 @@ $(document).ready(function() {
   }
 
   function getCatLimit() {
-    //console.log("getCatLimit");
+    console.log("getCatLimit");
 
-    // var catNumber = 20; //default
-    // var numberInput = $("#catsNumberInput").val();
-    //
-    // if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
-    //   catNumber = numberInput;
-    // }
-    //
-    // localStorage.numberOfCats = catNumber;
-    // return catNumber;
-    return 5;
+    var catNumber = 20; //default
+    var numberInput = $("#catsNumberInput").val();
+
+    if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
+      catNumber = numberInput;
+    }
+
+    localStorage.numberOfCats = catNumber;
+    return catNumber;
+    // return 5;
   }
 
   function changeImageSize() {
-    //console.log("changeImageSize");
-
+    // console.log("changeImageSize");
+    //
     // var dimensions = $("#imageSizeSlider").val();
     // $("#catContainer div").height(dimensions);
     // $("#catContainer div").width(dimensions);
