@@ -14,7 +14,7 @@ img {
   /* singleCat's setting */
 }
 
-/* #catContainer div:not(.occupied) {
+/* #catContainer div:not(.occupied), .hidden {
   display: none;
 } */
 

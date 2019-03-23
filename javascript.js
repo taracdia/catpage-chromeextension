@@ -1,6 +1,6 @@
 $(document).ready(function() {
   const REQUEST_LIMIT = 100; //maximum length of the Get responses from the API
-  
+
   //sub_id in API is userID in local storage
 
   //initial setup
@@ -19,8 +19,6 @@ $(document).ready(function() {
     div.append(btn);
     div.append(img);
   }
-
-  /*
 
   $(".imageButton").hide();
 
@@ -43,7 +41,6 @@ $(document).ready(function() {
   $(document).mouseout(function() {
     $("#buttonBar").css("visibility", "hidden");
   });
-  */
 
   //workaround to avoid code duplication and having to make a deep copy of an object
   function getSettings() {
@@ -72,7 +69,7 @@ $(document).ready(function() {
       }
     });
   }
-  /*
+
   if (localStorage.numberOfCats) {
     $("#catsNumberInput").val(localStorage.numberOfCats);
   }
@@ -93,8 +90,6 @@ $(document).ready(function() {
     singleMode();
   }
 
-  */
-
   //-----temp-------
   $("#showCookies").click(function() {
     console.log("imageSize is " + localStorage.imageSize);
@@ -108,17 +103,16 @@ $(document).ready(function() {
   })
   //-----temp------
   //--Listeners--
-  /*
+
   $("#imageSizeSlider").change(function() {
-    //console.log("slider changed");
+    console.log("slider changed");
 
     localStorage.imageSize = $("#imageSizeSlider").val();
     changeImageSize();
   });
 
-
   $("input[name=numberMode]:radio").change(function() {
-    //console.log("radio changed to " + $("input[name='numberMode']:checked").val());
+    console.log("radio changed to " + $("input[name='numberMode']:checked").val());
 
     if ($("input[name='numberMode']:checked").val() === "one") {
       singleMode();
@@ -126,7 +120,7 @@ $(document).ready(function() {
       multiMode();
     }
   });
-  */
+
 
   $("#getFavesButton").click(function() {
     console.log("getFavesButton click");
@@ -140,13 +134,10 @@ $(document).ready(function() {
     getRandomCats();
   });
   //-----------
-  /*
-  function singleMode() {
-    //console.log("singleMode");
 
-    // if (!($("firstMultDiv").hasClass("occupied"))){
-    //   getFaveCats();
-    // }
+  function singleMode() {
+    console.log("singleMode");
+
     $("#getFavesButton").text("Get Fave");
     $("#newCatsButton").text("Get New Cat");
     localStorage.multipleBoolean = false;
@@ -161,7 +152,7 @@ $(document).ready(function() {
   }
 
   function multiMode() {
-    //console.log("multiMode");
+    console.log("multiMode");
 
     changeImageSize();
     $("#getFavesButton").text("Get Faves");
@@ -175,7 +166,7 @@ $(document).ready(function() {
     $("#firstMultDiv").addClass("multiModeCard");
     $(".multiModeCard").removeClass("hidden");
   }
-  */
+
 
   function setDivs(array) {
     console.log("setDivs");
@@ -260,7 +251,7 @@ $(document).ready(function() {
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites";
     settings.method = "POST";
-    settings.data = "{\"image_id\":\"" + imageID + "\",\"sub_id\":\"" + localStorage.userID + "\"}";
+    settings.data = JSON.stringify({"image_id": imageID, "sub_id": localStorage.userID});
     $.ajax(settings)
       .done(function(response) {
         console.log(response);
@@ -321,7 +312,6 @@ $(document).ready(function() {
     } while (counter < catLimit);
 
     return outputArray;
-    // return inputArray;
   }
 
   function getFaveCats() {
@@ -355,14 +345,13 @@ $(document).ready(function() {
 
     localStorage.numberOfCats = catNumber;
     return catNumber;
-    // return 5;
   }
 
   function changeImageSize() {
-    // console.log("changeImageSize");
-    //
-    // var dimensions = $("#imageSizeSlider").val();
-    // $("#catContainer div").height(dimensions);
-    // $("#catContainer div").width(dimensions);
+    console.log("changeImageSize");
+
+    var dimensions = $("#imageSizeSlider").val();
+    $("#catContainer div").height(dimensions);
+    $("#catContainer div").width(dimensions);
   }
 });
