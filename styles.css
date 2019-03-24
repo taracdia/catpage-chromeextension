@@ -1,22 +1,49 @@
 body {
-  background-image: url("background.png");
+  background-image: linear-gradient(white, blue);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
 }
 
-img {
-  max-width: 100%;
-  max-height: 100%;
+html, body, div.flexContainer, div#firstMultDiv:not(.multiModeCard) {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#buttonBar {
+  align-self: center;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.flexContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+#catContainer:not(.flexContainer) {
+ /* width: 95%; */
+ align-self: center;
+ text-align: center;
 }
 
 .multiModeCard{
   /* default size */
   height: 200px;
   width: 200px;
-  border-style: solid;
   border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
 }
 
 #catContainer div{
-  /* singleCat's setting */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #catContainer div:not(.occupied), .hidden {
@@ -24,12 +51,12 @@ img {
 }
 
 .imageButton {
-  position: absolute;
-  border-radius: 25px;
+  float: right;
   font-weight: bold;
   color: white;
   border: none;
   font-size: 20px;
+  border-radius: 25px;
   height: 30px;
   width: 30px;
   line-height: 18px;

@@ -11,7 +11,6 @@ $(document).ready(function() {
     }
     $("#catContainer").append(div);
     div.append($("<button class='imageButton'>+</button>"));
-    div.append($("<img>"));
   }
 
   $(".imageButton").hide();
@@ -131,8 +130,10 @@ $(document).ready(function() {
     $("#sliderContainer").hide();
 
     $("#firstMultDiv").removeClass("multiModeCard");
-    $("#firstMultDiv").removeAttr("style");
+    $("#firstMultDiv").css("height", "").css("width", "");
     $(".multiModeCard").addClass("hidden");
+    $("#catContainer").addClass("flexContainer");
+
   }
 
   function multiMode() {
@@ -149,6 +150,7 @@ $(document).ready(function() {
 
     $("#firstMultDiv").addClass("multiModeCard");
     $(".multiModeCard").removeClass("hidden");
+    $("#catContainer").removeClass("flexContainer");
   }
 
   function setDivs(array) {
@@ -163,20 +165,16 @@ $(document).ready(function() {
     console.log("changeDiv");
 
     var btn = div.children("button");
-    var img = div.children("img");
     btn.off("click");
 
     if (typeof cat === "undefined") {
-      //wipe the div
+      //hide the div by saying it is not occupied. This tells the css file that it should be hidden
       div.removeClass("occupied");
-      img.removeAttr("src");
-      btn
-        .text("")
-        .removeClass("deleteButton addFaveButton");
     } else {
       div.addClass("occupied");
+      var imageURL;
       if (cat["image"]) {
-        img.attr("src", cat["image"]["url"]);
+        imageURL = cat["image"]["url"];
 
         btn
           .text("X")
@@ -186,7 +184,7 @@ $(document).ready(function() {
             deleteButtonOnClick($(this), cat["id"], cat["image"]["id"]);
           });
       } else if (cat["favourite"]) {
-        img.attr("src", cat["url"]);
+        imageURL = cat["url"];
 
         btn
           .text("X")
@@ -196,7 +194,7 @@ $(document).ready(function() {
             deleteButtonOnClick($(this), cat["favourite"]["id"], cat["id"]);
           });
       } else {
-        img.attr("src", cat["url"]);
+        imageURL = cat["url"];
 
         btn
           .text("+")
@@ -206,6 +204,7 @@ $(document).ready(function() {
             addFaveButtonOnClick($(this), cat["id"]);
           });
       }
+      div.css("background-image", "url(" + imageURL + ")");
     }
   }
 
@@ -328,7 +327,7 @@ $(document).ready(function() {
   function getCatLimit() {
     console.log("getCatLimit");
 
-    var catNumber = 20; //default
+    var catNumber = 5; //default
     var numberInput = $("#catsNumberInput").val();
     if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
       catNumber = numberInput;
