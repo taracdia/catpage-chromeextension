@@ -15,7 +15,6 @@ html, body, div.flexContainer, div#firstMultDiv:not(.multiModeCard) {
 
 #buttonBar {
   align-self: center;
-  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .flexContainer {
@@ -24,7 +23,6 @@ html, body, div.flexContainer, div#firstMultDiv:not(.multiModeCard) {
 }
 
 #catContainer:not(.flexContainer) {
- /* width: 95%; */
  align-self: center;
  text-align: center;
 }
