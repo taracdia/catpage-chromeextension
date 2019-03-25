@@ -1,9 +1,9 @@
 $(document).ready(function() {
   const REQUEST_LIMIT = 100; //maximum length of the Get responses from the API
-
   //sub_id in API is userID in local storage
 
-  //initial setup
+  //-----initial setup----
+  //This creates the hundred divs that hold the pictures of cats and each div's action button
   for (var i = 0; i < REQUEST_LIMIT; i++) {
     var div = $("<div class='multiModeCard'></div>");
     if (i === 0) {
@@ -13,22 +13,20 @@ $(document).ready(function() {
     div.append($("<button class='imageButton'>+</button>"));
   }
 
+  //the add/delete buttons are only visible when the user mouses over their div
   $(".imageButton").hide();
-
   $("#catContainer div").mouseover(function() {
     $(this).children("button").show()
   });
-
   $("#catContainer div").mouseout(function() {
     $(this).children("button").hide()
   });
 
+  //the button bar is only visible when the user mouses over the page
   $("#buttonBar").hide();
-
   $(document).mouseover(function() {
     $("#buttonBar").show()
   });
-
   $(document).mouseout(function() {
     $("#buttonBar").hide()
   });
@@ -47,6 +45,7 @@ $(document).ready(function() {
   }
 
   //-----local storage settings-----
+  //if the userID hasn't been set previously, try to get their Google ID. If that succeeds, save the userID. If they are not signed in, disable the buttons that require the userID to work
   if (typeof localStorage.userID === "undefined") {
     chrome.identity.getProfileUserInfo(function(userInfo) {
       var userID = JSON.stringify(userInfo["id"]);
@@ -61,57 +60,32 @@ $(document).ready(function() {
     });
   }
 
-  if (localStorage.numberOfCats) {
-    $("#catsNumberInput").val(localStorage.numberOfCats);
-  }
+  //if these numbers are saved in local storage, set those numbers to their input elements
+  if (localStorage.numberOfCats) {$("#catsNumberInput").val(localStorage.numberOfCats);}
+  if (localStorage.imageSize) {$("#imageSizeSlider").val(localStorage.imageSize);}
 
-  if (localStorage.imageSize) {
-    $("#imageSizeSlider").val(localStorage.imageSize);
-  }
-
+  //if these booleans have been set before, use their settings. Else, go with the default "single random" cat mode
   if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
     getFaveCats();
   } else {
     getRandomCats();
   }
-
   if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
     multiMode();
   } else {
     singleMode();
   }
 
-  //-----temp-------
-  $("#showCookies").click(function() {
-    console.log("imageSize is " + localStorage.imageSize);
-    console.log("faveBoolean is " + localStorage.faveBoolean);
-    console.log("numberOfCats is " + localStorage.numberOfCats);
-    console.log("userID is " + localStorage.userID);
-    console.log("multipleBoolean is " + localStorage.multipleBoolean);
-  })
-  $("#resetCookies").click(function() {
-    localStorage.clear();
-  })
-  //-----temp------
   //--Listeners--
-
-  $("#imageSizeSlider").change(function() {
-    console.log("slider changed");
-
-    localStorage.imageSize = $("#imageSizeSlider").val();
-    changeImageSize();
-  });
+  $("#imageSizeSlider").change(changeImageSize);
 
   $("input[name=numberMode]:radio").change(function() {
-    console.log("radio changed to " + $("input[name='numberMode']:checked").val());
-
-    if ($("input[name='numberMode']:checked").val() === "one") {
+    if ($("input[name='numberMode']:checked").val() === "single") {
       singleMode();
     } else {
       multiMode();
     }
   });
-
 
   $("#getFavesButton").click(getFaveCats);
 
@@ -119,13 +93,11 @@ $(document).ready(function() {
   //-----------
 
   function singleMode() {
-    console.log("singleMode");
-
     $("#getFavesButton").text("Get Fave");
     $("#newCatsButton").text("Get New Cat");
     localStorage.multipleBoolean = false;
     $("[name='numberMode']").removeAttr("checked");
-    $("input[name=numberMode][value=one]").prop("checked", true);
+    $("input[name=numberMode][value=single]").prop("checked", true);
     $("#catsNumberInput").hide();
     $("#sliderContainer").hide();
 
@@ -133,18 +105,15 @@ $(document).ready(function() {
     $("#firstMultDiv").css("height", "").css("width", "");
     $(".multiModeCard").addClass("hidden");
     $("#catContainer").addClass("flexContainer");
-
   }
 
   function multiMode() {
-    console.log("multiMode");
-
     changeImageSize();
     $("#getFavesButton").text("Get Faves");
     $("#newCatsButton").text("Get New Cats");
     localStorage.multipleBoolean = true;
     $("[name='numberMode']").removeAttr("checked");
-    $("input[name=numberMode][value=many]").prop("checked", true);
+    $("input[name=numberMode][value=multiple]").prop("checked", true);
     $("#catsNumberInput").show();
     $("#sliderContainer").show();
 
@@ -154,15 +123,13 @@ $(document).ready(function() {
   }
 
   function setDivs(array) {
-    console.log("setDivs");
-
     for (var i = 0; i < REQUEST_LIMIT; i++) {
       changeDiv($("#catContainer div").eq(i), array[i]);
     }
   }
 
   function changeDiv(div, cat) {
-    console.log("changeDiv");
+
 
     var btn = div.children("button");
     btn.off("click");
@@ -209,14 +176,14 @@ $(document).ready(function() {
   }
 
   function deleteButtonOnClick(button, faveID, imageID) {
-    console.log("deleteButtonOnClick");
+
 
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites/" + faveID;
     settings.method = "DELETE";
     $.ajax(settings)
       .done(function(response) {
-        console.log(response);
+
 
         button
           .text("+")
@@ -230,7 +197,7 @@ $(document).ready(function() {
   }
 
   function addFaveButtonOnClick(button, imageID) {
-    console.log("addFaveButtonOnClick");
+
 
     var settings = getSettings();
     settings.url = "https://api.thecatapi.com/v1/favourites";
@@ -241,7 +208,7 @@ $(document).ready(function() {
     });
     $.ajax(settings)
       .done(function(response) {
-        console.log(response);
+
 
         button
           .text("X")
@@ -264,7 +231,7 @@ $(document).ready(function() {
   }
 
   function getRandomCats() {
-    console.log("getRandomCats");
+
 
     localStorage.faveBoolean = false;
 
@@ -276,14 +243,12 @@ $(document).ready(function() {
     }
 
     $.ajax(settings).done(function(response) {
-      console.log(response);
-
       setDivs(response);
     });
   }
 
   function shuffleArray(inputArray) {
-    console.log("shuffleArray");
+
 
     var outputArray = [];
     var counter = 0;
@@ -305,7 +270,7 @@ $(document).ready(function() {
   }
 
   function getFaveCats() {
-    console.log("getFaveCats");
+
 
     localStorage.faveBoolean = true;
 
@@ -314,7 +279,7 @@ $(document).ready(function() {
     settings.method = "GET";
 
     $.ajax(settings).done(function(response) {
-      console.log(response);
+
       if (response.length === 0) {
         alert("You don't have any favorites!");
         getRandomCats();
@@ -325,9 +290,7 @@ $(document).ready(function() {
   }
 
   function getCatLimit() {
-    console.log("getCatLimit");
-
-    var catNumber = 5; //default
+    var catNumber = 15; //default
     var numberInput = $("#catsNumberInput").val();
     if (numberInput > 0 && numberInput <= REQUEST_LIMIT) {
       catNumber = numberInput;
@@ -338,9 +301,8 @@ $(document).ready(function() {
   }
 
   function changeImageSize() {
-    console.log("changeImageSize");
-
     var dimensions = $("#imageSizeSlider").val();
+    localStorage.imageSize = dimensions;
     $("#catContainer div").height(dimensions);
     $("#catContainer div").width(dimensions);
   }

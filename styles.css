@@ -60,6 +60,10 @@ html, body, div.flexContainer, div#firstMultDiv:not(.multiModeCard) {
   line-height: 18px;
 }
 
+.imageButton:disabled {
+  visibility: hidden;
+}
+
 .deleteButton {
   background-color: red;
 }
