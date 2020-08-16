@@ -6,16 +6,18 @@
   "version": "2.0",
   "author": "Tara Dia",
   "browser_action": {
-    "default_icon": "tab-icon.png",
+    "default_icon": "./public/tab-icon.png",
     "default_title": "Cat Mewseum"
   },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
+  "background": {
+    "scripts": ["./public/background.js"],
+    "persistent": false
+  },
   "permissions": [ 
-    "activeTab"
-   ],
-  "optional_permissions": [
+    "activeTab",
     "identity",
     "identity.email",
     "storage"

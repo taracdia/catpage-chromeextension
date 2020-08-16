@@ -2,34 +2,34 @@ $(document).ready(function() {
   const REQUEST_LIMIT = 100; //maximum length of the Get responses from the API
   //sub_id in API is userID in local storage
 
-  //-----initial setup----
+{  //-----initial setup----
   //This creates the hundred divs that hold the pictures of cats and each div's action button
-  for (var i = 0; i < REQUEST_LIMIT; i++) {
-    var div = $("<div class='multiModeCard'></div>");
-    if (i === 0) {
-      div.attr("id", "firstMultDiv");
-    }
-    $("#catContainer").append(div);
-    div.append($("<button class='imageButton'>+</button>"));
-  }
+  // for (var i = 0; i < REQUEST_LIMIT; i++) {
+  //   var div = $("<div class='multiModeCard'></div>");
+  //   if (i === 0) {
+  //     div.attr("id", "firstMultDiv");
+  //   }
+  //   $("#catContainer").append(div);
+  //   div.append($("<button class='imageButton'>+</button>"));
+  // }
 
   //the add/delete buttons are only visible when the user mouses over their div
-  $(".imageButton").hide();
-  $("#catContainer div").mouseover(function() {
-    $(this).children("button").show()
-  });
-  $("#catContainer div").mouseout(function() {
-    $(this).children("button").hide()
-  });
+  // $(".imageButton").hide();
+  // $("#catContainer div").mouseover(function() {
+  //   $(this).children("button").show()
+  // });
+  // $("#catContainer div").mouseout(function() {
+  //   $(this).children("button").hide()
+  // });
 
-  //the button bar is only visible when the user mouses over the page
-  $("#buttonBar").hide();
-  $(document).mouseover(function() {
-    $("#buttonBar").show()
-  });
-  $(document).mouseout(function() {
-    $("#buttonBar").hide()
-  });
+  // //the button bar is only visible when the user mouses over the page
+  // $("#buttonBar").hide();
+  // $(document).mouseover(function() {
+  //   $("#buttonBar").show()
+  // });
+  // $(document).mouseout(function() {
+  //   $("#buttonBar").hide()
+  // });}
 
   //workaround to avoid code duplication and having to make a deep copy of an object
   function getSettings() {
@@ -61,76 +61,74 @@ $(document).ready(function() {
   }
 
   //if these numbers are saved in local storage, set those numbers to their input elements
-  if (localStorage.numberOfCats) {$("#catsNumberInput").val(localStorage.numberOfCats);}
-  if (localStorage.imageSize) {$("#imageSizeSlider").val(localStorage.imageSize);}
+  // if (localStorage.numberOfCats) {$("#catsNumberInput").val(localStorage.numberOfCats);}
+  // if (localStorage.imageSize) {$("#imageSizeSlider").val(localStorage.imageSize);}
 
   //if these booleans have been set before, use their settings. Else, go with the default "single random" cat mode
-  if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
-    getFaveCats();
-  } else {
-    getRandomCats();
-  }
-  if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
-    multiMode();
-  } else {
-    singleMode();
+  // if (localStorage.faveBoolean && localStorage.faveBoolean === "true") {
+  //   getFaveCats();
+  // } else {
+  //   getRandomCats();
+  // }
+  // if (localStorage.multipleBoolean && localStorage.multipleBoolean === "true") {
+  //   multiMode();
+  // } else {
+  //   singleMode();
   }
 
   //--Listeners--
-  $("#imageSizeSlider").change(changeImageSize);
+  // $("#imageSizeSlider").change(changeImageSize);
 
-  $("input[name=numberMode]:radio").change(function() {
-    if ($("input[name='numberMode']:checked").val() === "single") {
-      singleMode();
-    } else {
-      multiMode();
-    }
-  });
+  // $("input[name=numberMode]:radio").change(function() {
+  //   if ($("input[name='numberMode']:checked").val() === "single") {
+  //     singleMode();
+  //   } else {
+  //     multiMode();
+  //   }
+  // });
 
-  $("#getFavesButton").click(getFaveCats);
+  // $("#getFavesButton").click(getFaveCats);
 
-  $("#newCatsButton").click(getRandomCats);
+  // $("#newCatsButton").click(getRandomCats);
   //-----------
 
-  function singleMode() {
-    $("#getFavesButton").text("Get Fave");
-    $("#newCatsButton").text("Get New Cat");
-    localStorage.multipleBoolean = false;
-    $("[name='numberMode']").removeAttr("checked");
-    $("input[name=numberMode][value=single]").prop("checked", true);
-    $("#catsNumberInput").hide();
-    $("#sliderContainer").hide();
+  // function singleMode() {
+  //   $("#getFavesButton").text("Get Fave");
+  //   $("#newCatsButton").text("Get New Cat");
+  //   localStorage.multipleBoolean = false;
+  //   $("[name='numberMode']").removeAttr("checked");
+  //   $("input[name=numberMode][value=single]").prop("checked", true);
+  //   $("#catsNumberInput").hide();
+  //   $("#sliderContainer").hide();
 
-    $("#firstMultDiv").removeClass("multiModeCard");
-    $("#firstMultDiv").css("height", "").css("width", "");
-    $(".multiModeCard").addClass("hidden");
-    $("#catContainer").addClass("flexContainer");
-  }
+  //   $("#firstMultDiv").removeClass("multiModeCard");
+  //   $("#firstMultDiv").css("height", "").css("width", "");
+  //   $(".multiModeCard").addClass("hidden");
+  //   $("#catContainer").addClass("flexContainer");
+  // }
 
-  function multiMode() {
-    changeImageSize();
-    $("#getFavesButton").text("Get Faves");
-    $("#newCatsButton").text("Get New Cats");
-    localStorage.multipleBoolean = true;
-    $("[name='numberMode']").removeAttr("checked");
-    $("input[name=numberMode][value=multiple]").prop("checked", true);
-    $("#catsNumberInput").show();
-    $("#sliderContainer").show();
+  // function multiMode() {
+  //   changeImageSize();
+  //   $("#getFavesButton").text("Get Faves");
+  //   $("#newCatsButton").text("Get New Cats");
+  //   localStorage.multipleBoolean = true;
+  //   $("[name='numberMode']").removeAttr("checked");
+  //   $("input[name=numberMode][value=multiple]").prop("checked", true);
+  //   $("#catsNumberInput").show();
+  //   $("#sliderContainer").show();
 
-    $("#firstMultDiv").addClass("multiModeCard");
-    $(".multiModeCard").removeClass("hidden");
-    $("#catContainer").removeClass("flexContainer");
-  }
+  //   $("#firstMultDiv").addClass("multiModeCard");
+  //   $(".multiModeCard").removeClass("hidden");
+  //   $("#catContainer").removeClass("flexContainer");
+  // }
 
-  function setDivs(array) {
-    for (var i = 0; i < REQUEST_LIMIT; i++) {
-      changeDiv($("#catContainer div").eq(i), array[i]);
-    }
-  }
+  // function setDivs(array) {
+  //   for (var i = 0; i < REQUEST_LIMIT; i++) {
+  //     changeDiv($("#catContainer div").eq(i), array[i]);
+  //   }
+  // }
 
   function changeDiv(div, cat) {
-
-
     var btn = div.children("button");
     btn.off("click");
 

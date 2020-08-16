@@ -1,5 +1,3 @@
-/*global chrome*/
-
 import React from "react";
 import { Button, Row, Col, Container, Form, Label, Input, FormGroup } from "reactstrap";
 import { faHeart as faHeartFilled } from "@fortawesome/free-solid-svg-icons";
@@ -25,9 +23,7 @@ class Main extends React.Component {
                     ? localStorage.getItem("imageSize")
                     : 4,
             isLoggedIn:
-                //default is false and check for if userId is stored
-                // !!(localStorage.getItem("isSingleCat") === "true")
-                true
+                (localStorage.getItem("userID") !== null)
         }
     }
 
@@ -43,25 +39,16 @@ class Main extends React.Component {
     getFaveCats = () => {
         this.setState({ "isFaveCat": true });
         localStorage.setItem("isFaveCat", true);
+        console.log("fave")
     }
 
     getRandomCats = () => {
         this.setState({ "isFaveCat": false });
         localStorage.setItem("isFaveCat", false);
+        console.log(localStorage.getItem("userID"))
     }
 
     render() {
-        // chrome.permissions.contains({
-        //     permissions: ['identity']
-        //   }, function(result) {
-        //       console.log(result);
-        //     if (result) {
-        //       // The extension has the permissions.
-        //     } else {
-        //       // The extension doesn't have the permissions.
-        //     }
-        //   });
-        console.log(chrome)
         const catContainers = [];
         let i;
         const upperBound = (this.state.isSingleCat) ? 1 : this.state.numOfCats;
@@ -144,7 +131,7 @@ class ButtonBar extends React.Component {
                                     checked={this.props.isSingleCat}
                                     onChange={this.props.handleChange}
                                     name="isSingleCat"
-                                />{' '}
+                                />
           Only One Cat Displayed
         </Label>
                         </FormGroup>
@@ -155,11 +142,19 @@ class ButtonBar extends React.Component {
                             <Input type="number" name="numOfCats" min="1" max="100" value={this.props.numOfCats} onChange={this.props.handleChange} id="catsNumberInput" />
                         </FormGroup>
                     </Col>
-                    <Col hidden={!this.props.isLoggedIn} xs="col-auto">
-                        <Button onClick={this.props.getFaveCats}>Get Fave</Button>
+                    <Col
+                        disabled={!this.props.isLoggedIn}
+                        xs="col-auto">
+                        <Button onClick={this.props.getFaveCats}>
+                            {(this.props.isSingleCat) ? "Get Fave" : "Get Faves"}
+                        </Button>
                     </Col>
-                    <Col xs="col-auto" className="m-2">
-                        <Button onClick={this.props.getRandomCats}>Get New Cat</Button>
+                    <Col
+                        xs="col-auto"
+                        className="m-2">
+                        <Button onClick={this.props.getRandomCats}>
+                            {(this.props.isSingleCat) ? "Get New Cat" : "Get New Cats"}
+                        </Button>
                     </Col>
                     <Col hidden={this.props.isSingleCat}>
                         <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={this.props.imageSize}
