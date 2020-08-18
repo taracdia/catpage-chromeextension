@@ -1,3 +1,5 @@
+// /*global chrome*/
+
 //todo: implement optional permissions
 chrome.runtime.onInstalled.addListener(function () {
     chrome.identity.getProfileUserInfo(function (userInfo) {
@@ -44,12 +46,24 @@ chrome.runtime.onInstalled.addListener(function () {
 //     });
 // }
 
-// function tryToStore(name, value) {
-//     chrome.permissions.contains({
-//         permissions: ["storage"]
-//     }, function (result) {
-//         if (result) {
-//             localStorage.setItem(name, value);
-//         }
-//     });
+// // function tryToStore(name, value) {
+// //     chrome.permissions.contains({
+// //         permissions: ["storage"]
+// //     }, function (result) {
+// //         if (result) {
+// //             localStorage.setItem(name, value);
+// //         }
+// //     });
+// // }
+
+// function addEventListener() {
+//     console.log("addEventListener")
+// document.querySelector('#askForStoragePermission').addEventListener('click', function(event) {
+//     console.log("event")
+//     askForStoragePermission();
+
+//   });
 // }
+
+// // chrome.runtime.onStartup.addListener(addEventListener())
+// setTimeout(addEventListener, 5000); 

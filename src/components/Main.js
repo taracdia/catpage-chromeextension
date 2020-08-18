@@ -31,21 +31,30 @@ class Main extends React.Component {
         const input = event.target;
         const value = input.type === 'checkbox' ? input.checked : input.value;
         const name = input.name;
-
-        this.setState({ [name]: value });
-        localStorage.setItem(name, value);
+        this.locallyStoreAndSetState(name, value);
     };
 
+    locallyStoreAndSetState = (name, value) => {
+        this.setState({ [name]: value });
+        localStorage.setItem(name, value);
+    }
+
     getFaveCats = () => {
-        this.setState({ "isFaveCat": true });
-        localStorage.setItem("isFaveCat", true);
+        this.locallyStoreAndSetState("isFaveCat", true);
         console.log("fave")
     }
 
     getRandomCats = () => {
-        this.setState({ "isFaveCat": false });
-        localStorage.setItem("isFaveCat", false);
-        console.log(localStorage.getItem("userID"))
+        this.locallyStoreAndSetState("isFaveCat", false);
+        console.log("random");
+    }
+
+    buttonBarEaseIn = () => {
+
+    }
+
+    buttonBarEaseOut = () => {
+
     }
 
     render() {
@@ -57,7 +66,7 @@ class Main extends React.Component {
                 <CatContainer
                     key={i}
                     isSingleCat={this.state.isSingleCat}
-                    catImage=".\logo192.png"
+                    catImage=".\tab-icon.png"
                     imageSize={this.state.imageSize}
                     isLoggedIn={this.state.isLoggedIn}
                 />
@@ -65,7 +74,12 @@ class Main extends React.Component {
         }
 
         return (
-            <Container className="border">
+            <Container
+            className="border"
+            onMouseEnter={this.buttonBarEaseIn}
+            onMouseLeave={this.buttonBarEaseOut}
+
+            >
                 <ButtonBar
                     className="border"
                     isSingleCat={this.state.isSingleCat}
@@ -100,13 +114,11 @@ class CatContainer extends React.Component {
     }
 
     render() {
-        //todo: add in font-awesome to have empty and filled heart
         return (
             //todo: have singleCat take up entire page
             <Col xs={(this.props.isSingleCat) ? 12 : this.props.imageSize} className="m-0 p-0">
                 {/* will have different text depending on whether or not the cat image is already in the user's favorites */}
                 <Button
-                    hidden={!this.props.isLoggedIn}
                     onClick={this.addOrDel}
                     className="btn btn-danger"
                 >
@@ -152,7 +164,9 @@ class ButtonBar extends React.Component {
                     <Col
                         xs="col-auto"
                         className="m-2">
-                        <Button onClick={this.props.getRandomCats}>
+                        <Button
+                            onClick={this.props.getRandomCats}
+                        >
                             {(this.props.isSingleCat) ? "Get New Cat" : "Get New Cats"}
                         </Button>
                     </Col>
