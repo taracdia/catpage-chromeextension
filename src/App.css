@@ -4,7 +4,20 @@ body {
   background-attachment: fixed;
 }
 
+html, body, #root, .full-height {
+  height: 100%;
+}
+
 .border {
   border: 1px solid red;
   background-color: rgb(255, 255, 255, .2);
+}
+
+.wrapper {
+  transition: margin .5s;
+  margin: 0 0 0 -250px;
+}
+
+.wrapper.is-nav-open {
+  margin-left: 0;
 }

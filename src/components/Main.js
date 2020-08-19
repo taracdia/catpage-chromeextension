@@ -1,13 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Row, Col, Container, Form, Label, Input, FormGroup } from "reactstrap";
 import { faHeart as faHeartFilled } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartEmpty } from "@fortawesome/free-regular-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import {Transition} from "react-transition-group"
+
+// const defaultStyle = {
+//     transition: `transform 200ms, opacity 200ms ease`,
+//     opacity: 1
+//   };
+
+//   const transitionStyles = {
+//     entering: { transform: 'scale(0.5)', opacity: 0 }, 
+//     entered: { transform: 'scale(2.0)', opacity: 1},
+//     exiting: { opacity: 0 },
+//     exited: { opacity: 0 }
+//   };
+const AComponent = ({ in: inProp }) => (
+    <Transition in={inProp} timeout={500} unmountOnExit>
+      {state => (
+        <div>
+          I am {state}
+        </div>
+      )}
+    </Transition>
+  ); 
+
+  function App(){
+    const [entered, setEntered] = useState(false);
+    return (
+      <div
+  >
+        <AComponent in={entered} />
+          <button
+            onClick={() => {
+              setEntered(!entered);
+            }}
+          >
+            Toggle Entered
+          </button>
+      </div>
+    );
+  }
+
 class Main extends React.Component {
     constructor(props) {
         super(props);
+
+        this.wrapperRef = React.createRef();
 
         this.state = {
             isSingleCat: localStorage.getItem("isSingleCat") === "true",
@@ -23,7 +65,9 @@ class Main extends React.Component {
                     ? localStorage.getItem("imageSize")
                     : 4,
             isLoggedIn:
-                (localStorage.getItem("userID") !== null)
+                (localStorage.getItem("userID") !== null),
+
+            buttonBarIsHidden: true
         }
     }
 
@@ -50,14 +94,51 @@ class Main extends React.Component {
     }
 
     buttonBarEaseIn = () => {
-
+        console.log("button in")
+        this.setState({ "buttonBarIsHidden": false });
     }
 
     buttonBarEaseOut = () => {
+        console.log("button out")
 
+        this.setState({ "buttonBarIsHidden": true });
+    }
+
+    handleButtonBar() {
+        const wrapper = this.wrapperRef.current;
+        wrapper.classList.toggle("is-nav-open");
     }
 
     render() {
+        return (<div>
+            <App />
+        </div>);
+
+        return (
+            <div 
+            ref={this.wrapperRef} 
+            className="wrapper full-height border"
+            onMouseLeave={() => this.handleButtonBar()}
+            onMouseEnter={() => this.handleButtonBar()}
+
+            >
+                <div className="nav"
+                >
+                    {/* <Button
+                        className="nav__icon"
+                        type="menu-fold"
+                        onClick={() => this.handleButtonBar()
+                        }
+
+                    >
+                        button
+                    </Button> */}
+                    <div className="nav__body">
+                        asdfasdfasdf
+                    </div>
+                </div>
+            </div>
+        );
         const catContainers = [];
         let i;
         const upperBound = (this.state.isSingleCat) ? 1 : this.state.numOfCats;
@@ -75,21 +156,22 @@ class Main extends React.Component {
 
         return (
             <Container
-            className="border"
-            onMouseEnter={this.buttonBarEaseIn}
-            onMouseLeave={this.buttonBarEaseOut}
-
+                className="border"
+                onMouseEnter={this.buttonBarEaseIn}
+                onMouseLeave={this.buttonBarEaseOut}
             >
-                <ButtonBar
-                    className="border"
-                    isSingleCat={this.state.isSingleCat}
-                    imageSize={this.state.imageSize}
-                    numOfCats={this.state.numOfCats}
-                    isLoggedIn={this.state.isLoggedIn}
-                    getFaveCats={this.getFaveCats}
-                    getRandomCats={this.getRandomCats}
-                    handleChange={this.handleChange}
-                />
+                {/* {this.state.buttonBarIsHidden ? "" : */}
+                    <ButtonBar
+                        className="border "
+                        isSingleCat={this.state.isSingleCat}
+                        imageSize={this.state.imageSize}
+                        numOfCats={this.state.numOfCats}
+                        isLoggedIn={this.state.isLoggedIn}
+                        getFaveCats={this.getFaveCats}
+                        getRandomCats={this.getRandomCats}
+                        handleChange={this.handleChange}
+                    />
+                {/* } */}
                 <Row>
                     {catContainers}
                 </Row>
