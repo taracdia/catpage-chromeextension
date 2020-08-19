@@ -2,8 +2,26 @@
   "name": "My Extension",
   "version": "1.0",
   "manifest_version": 2,
-  "browser_action": {
-      "default_popup": "index.html"
+  "browser_action": {},
+  "background": {
+    "scripts": [
+      "app/background.js"
+    ]
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "css": [
+        "/static/css/main.css",
+        "/static/css/content.css"
+      ],
+      "js": [
+        "/static/js/0.chunk.js",
+        "/static/js/content.js"
+      ]
+    }
+  ],
   "content_security_policy": "script-src 'self' 'sha256-Fk630K89GEbmIwmi3sgMaf3tYbfMdF0e616h2Bslv9g='; object-src 'self'"
 }
