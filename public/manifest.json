@@ -1,27 +1,36 @@
 {
-  "name": "My Extension",
-  "version": "1.0",
-  "manifest_version": 2,
-  "browser_action": {},
-  "background": {
-    "scripts": [
-      "app/background.js"
-    ]
-  },
-  "content_scripts": [
+  "short_name": "React App",
+  "name": "Create React App Sample",
+  "icons": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "css": [
-        "/static/css/main.css",
-        "/static/css/content.css"
-      ],
-      "js": [
-        "/static/js/0.chunk.js",
-        "/static/js/content.js"
-      ]
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
-  "content_security_policy": "script-src 'self' 'sha256-Fk630K89GEbmIwmi3sgMaf3tYbfMdF0e616h2Bslv9g='; object-src 'self'"
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "permissions": [ 
+    "activeTab"
+  ],
+  "optional_permissions": [ 
+    "identity",
+    "identity.email",
+    "storage"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
 }
