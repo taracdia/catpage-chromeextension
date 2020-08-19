@@ -1,25 +1,9 @@
 {
-  "content_security_policy": "script-src 'self' 'sha256-Fk630K89GEbmIwmi3sgMaf3tYbfMdF0e616h2Bslv9g='; object-src 'self'",
+  "name": "My Extension",
+  "version": "1.0",
   "manifest_version": 2,
-  "name": "Cat Mewseum",
-  "description": "Get cats in your new tab! See your favorites, or random cats!",
-  "version": "2.0",
-  "author": "Tara Dia",
   "browser_action": {
-    "default_icon": "tab-icon.png",
-    "default_title": "Cat Mewseum"
+      "default_popup": "index.html"
   },
-  "chrome_url_overrides": {
-    "newtab": "index.html"
-  },
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
-  },
-  "permissions": [ 
-    "activeTab", 
-    "identity",
-    "identity.email",
-    "storage"
-  ]
+  "content_security_policy": "script-src 'self' 'sha256- change this ='; object-src 'self'"
 }
