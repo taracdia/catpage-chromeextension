@@ -1,20 +1,13 @@
-/* global chrome */
-import React from 'react';
-import logo from './logo.svg';
-import ReactDOM from 'react-dom';
-import './App.css';
-import Frame, { FrameContextConsumer }from 'react-frame-component';
-import { render } from '@testing-library/react';
+import React from "react";
+import "./App.css";
+import Main from "./components/Main.js";
 
-class App extends React.Component {
-
-render(){
-  return (
-    <Frame> 
-      
-    </Frame>
-)
-}
+class App extends React.Component { 
+  render() {
+    return (
+        <Main />
+    );
+  }
 }
 
 export default App;

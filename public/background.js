@@ -1,3 +1,6 @@
 /* global chrome */
 
-console.log(chrome)
+//todo: implement optional permissions
+
+
+// console.log(chrome)

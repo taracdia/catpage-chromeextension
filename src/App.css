@@ -1,38 +1,42 @@
-.App {
-  text-align: center;
+body {
+  background-image: linear-gradient(white, blue);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+html, body, #root, .full-height {
+  height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.full-height-width {
+  min-height: 100%;
+  width: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.border {
+  border: 1px solid red;
+  background-color: rgb(255, 255, 255, .2);
 }
 
-.App-link {
-  color: #61dafb;
+.element-enter {
+  opacity: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.element-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in, margin 300ms ease-out;
+}
+
+.element-exit {
+  opacity: 1;
+}
+
+.element-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out, margin 300ms ease-in;
+}
+
+.faveButton {
+  position: absolute;
+  right: 0;
 }

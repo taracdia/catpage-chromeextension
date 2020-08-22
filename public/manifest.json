@@ -1,36 +1,23 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff",
+  "content_security_policy": "script-src 'self' 'sha256-Fk630K89GEbmIwmi3sgMaf3tYbfMdF0e616h2Bslv9g='; object-src 'self'",
+  "manifest_version": 2,
+  "name": "Cat Mewseum",
+  "description": "Get cats in your new tab! See your favorites, or random cats!",
+  "version": "2.0",
+  "author": "Tara Dia",
+  "browser_action": {
+    "default_icon": "tab-icon.png",
+    "default_title": "Cat Mewseum"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
   "permissions": [ 
-    "activeTab"
-  ],
-  "optional_permissions": [ 
+    "activeTab",
     "identity",
-    "identity.email",
     "storage"
   ],
-  "background": {
-    "scripts": ["background.js"]
-  }
+  "optional_permissions": [ 
+    "identity.email"
+  ]
 }

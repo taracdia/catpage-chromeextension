@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Cat Mewseum</title>
+  <script src="jquery.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <p id="buttonBar">
+    <input type="radio" name="numberMode" value="single" checked>One cat
+    <input type="radio" name="numberMode" value="multiple">Multiple cats
+    <input type="number" name="catsNumber" min="1" max="100" placeholder="# of cats" id="catsNumberInput">
+    <button id="getFavesButton">Get Fave</button>
+    <button id="newCatsButton">Get New Cat</button>
+    <span id="sliderContainer"><input type="range" min="60" max="1000" value="200" class="slider" id="imageSizeSlider">Image size</span>
+  </p>
+  <div id="catContainer"></div>
+</body>
+<script src="javascript.js"></script>
+
+</html>
