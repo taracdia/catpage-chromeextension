@@ -1,30 +1,36 @@
 import React from "react";
 import { faHeart as faHeartFilled } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartEmpty } from "@fortawesome/free-regular-svg-icons";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "reactstrap";
+import { Button, Card, CardImg, Col, Row, Container } from "reactstrap";
 import TransitionWrapper from "./TransitionWrapper";
 
 class CatContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            alreadyInFaves: false,
-            buttonIsHidden: true
+            alreadyInFaves: this.props.isFaveCat,
+            buttonIsHidden: true,
+            faveId: null
+            //todo: pass faveId
         }
     }
 
     addOrDel = () => {
+        
+        const callback = () => this.setState({ alreadyInFaves: !this.state.alreadyInFaves });
         if (this.state.alreadyInFaves) {
+            //todo: remove faveId
         } else {
+            //todo: store faveId
         }
-        this.setState({ alreadyInFaves: !this.state.alreadyInFaves })
 
     }
 
     handleButtonClick = () => {
         if (localStorage.getItem("userID") === null) {
-            this.props.askForPermission(this.addOrDel);
+            // this.props.askForPermission(this.addOrDel);
         } else {
             this.addOrDel();
         }
@@ -35,10 +41,45 @@ class CatContainer extends React.Component {
     }
 
     render() {
+        if (this.props.errMessage) {
+            return (<div className="error">
+                {this.props.errMessage}
+            </div>)
+        }else if (!this.props.catObject) {
+            return (
+                <div
+                    className="loaderContainer"
+                >
+                    <FontAwesomeIcon
+                        icon={faCircleNotch}
+                        className="fa-spin loading"
+                    />
+                </div>
+            )
+        }
+
         return (
+            // <Container
+            // className="border-red"
+            // style={{
+            //     "min-height": "100%",
+            //     "width": "100%",
+            // }}
+            // >
+            //     <Row>
+            //         <Col>
+                    
             <div
-            onMouseEnter={() => this.changeButtonHidden(false)}
-            onMouseLeave={() => this.changeButtonHidden(true)}
+            style={{
+                "min-height": "100%",
+                "width": "100%",
+            }}
+            className="flex-fill border-red"
+            >
+            <Card
+                onMouseEnter={() => this.changeButtonHidden(false)}
+                onMouseLeave={() => this.changeButtonHidden(true)}
+                className="full-height cat-card middle border-red"
             >
                 <TransitionWrapper
 
@@ -56,8 +97,17 @@ class CatContainer extends React.Component {
                         </div>
                     }
                 </TransitionWrapper>
-                <img className="border w-100" src={this.props.catImage} alt="cat" />
-                </div>
+                <CardImg
+                width="100%"
+                src={this.props.catObject.url}
+                alt="Cat"
+                className="full-height"
+                 />
+            </Card>
+            </div>
+            // </Col>
+            //     </Row>
+            // </Container>
         )
     }
 }

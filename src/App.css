@@ -1,42 +1,83 @@
 body {
-  background-image: linear-gradient(white, blue);
+  background-image: url("background.jpg");
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-color: teal;
+  background-size: cover;
 }
 
-html, body, #root, .full-height {
+html, body, #root {
   height: 100%;
 }
 
-.full-height-width {
+.full-height {
   min-height: 100%;
-  width: 100%;
 }
 
-.border {
-  border: 1px solid red;
+.border-red {
+  border: 3px solid red;
   background-color: rgb(255, 255, 255, .2);
 }
 
-.element-enter {
-  opacity: 0;
+.border-blue {
+  border: 3px solid blue;
+  background-color: rgb(255, 255, 255, .2);
 }
 
-.element-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-in, margin 300ms ease-out;
+.error {
+  color: red;
+  font-size: 100%;
+  background-color: black;
+  font-weight: bold;
+}
+/* 
+.card.cat-card {
+  background-color: rgb(255, 255, 255, .2);
+  display: flex;
 }
 
-.element-exit {
-  opacity: 1;
-}
-
-.element-exit-active {
-  opacity: 0;
-  transition: opacity 300ms ease-out, margin 300ms ease-in;
-}
+.middle {
+  justify-content: center;
+  align-content: center;
+} */
 
 .faveButton {
   position: absolute;
   right: 0;
+}
+
+#buttonBar {
+  background-color: rgb(179, 255, 255, .5);
+}
+
+.loaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading {
+  color: blue;
+  font-size: 28px;
+}
+
+.noFaves {
+  background-color: rgb(179, 255, 255, .5);
+}
+
+
+/* Transition CSS */
+.element-enter {
+  opacity: 0;
+}
+.element-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in, margin 300ms ease-out;
+}
+.element-exit {
+  opacity: 1;
+}
+.element-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out, margin 300ms ease-in;
 }
