@@ -1,30 +1,45 @@
 import React from "react";
 import { Row, Col, Form, Label, Input, FormGroup, Container } from "reactstrap";
+import { Velocity } from 'velocity-react';
 
-function ButtonBar(props) {
+class ButtonBar extends React.Component {
+    componentWillEnter (callback) {
+        const element = this.container.getDOMNode();
+        Velocity(element, 'slideDown', { duration: 300 }).then(callback);
+    }
+
+    componentWillLeave (callback) {
+        const element = this.container.getDOMNode();
+        Velocity(element, 'slideUp', { duration: 300 }).then(callback);
+    }
+
+    setContainer(c) {
+        this.container = c;
+    }
+    render(){
     return (
         <div
             id="buttonBar"
         >
-            <Container>
+            <Container ref={this.setContainer.bind(this)}>
                 <Form className="text-center">
                     <Row form className="align-items-center">
                         <Col>
                             <FormGroup check>
                                 <Label check>
                                     <Input type="checkbox"
-                                        checked={props.isSingleCat}
-                                        onChange={props.handleChange}
+                                        checked={this.props.isSingleCat}
+                                        onChange={this.props.handleChange}
                                         name="isSingleCat"
                                     />
           Only One Cat Displayed
         </Label>
                             </FormGroup>
                         </Col>
-                        <Col hidden={props.isSingleCat}>
+                        <Col hidden={this.props.isSingleCat}>
                             <FormGroup>
                                 <Label for="catsNumberInput">Number of Cats to Display</Label>
-                                <Input type="number" name="numOfCats" min="1" max="100" value={props.numOfCats} onChange={props.handleChange} id="catsNumberInput" />
+                                <Input type="number" name="numOfCats" min="1" max="100" value={this.props.numOfCats} onChange={this.props.handleChange} id="catsNumberInput" />
                             </FormGroup>
                         </Col>
                         <Col
@@ -32,9 +47,9 @@ function ButtonBar(props) {
                         >
                             <button
                                 type="button"
-                                className="btn btn-primary" onClick={props.getFavesButton}
+                                className="btn btn-primary" onClick={this.props.getFavesButton}
                             >
-                                {props.isSingleCat ? "Get Fave" : "Get Faves"}
+                                {this.props.isSingleCat ? "Get Fave" : "Get Faves"}
                             </button>
                         </Col>
                         <Col
@@ -43,22 +58,23 @@ function ButtonBar(props) {
                             <button
                                 type="button"
                                 className="btn btn-primary"
-                                onClick={props.getRandomsButton}
+                                onClick={this.props.getRandomsButton}
                             >
-                                {props.isSingleCat ? "Get New Cat" : "Get New Cats"}
+                                {this.props.isSingleCat ? "Get New Cat" : "Get New Cats"}
                             </button>
                         </Col>
-                        <Col hidden={props.isSingleCat}>
-                            <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={props.imageSize}
-                                onChange={props.handleChange} />
+                        <Col hidden={this.props.isSingleCat}>
+                            <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={this.props.imageSize}
+                                onChange={this.props.handleChange} />
                             {/* todo: remove showing the number */}
-                            <Label for="imageSizeSlider">Image size {props.imageSize}</Label>
+                            <Label for="imageSizeSlider">Image size {this.props.imageSize}</Label>
                         </Col>
                     </Row>
                 </Form>
             </Container>
         </div>
     );
+    }
 }
 
 export default ButtonBar;

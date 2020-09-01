@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Row, Container, Col } from "reactstrap";
 import CatContainer from "./CatContainer";
 import ButtonBar from "./ButtonBar";
-import TransitionWrapper from "./TransitionWrapper";
 import API from "./API";
 import askForPermission from "./askForPermission";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-//todo: handle situation where try to favoirte somehting already favorited
+import { VelocityTransitionGroup } from "velocity-react";
 
 function Main() {
     //Variables controlled by buttons and saved in local storage
@@ -83,7 +81,7 @@ function Main() {
         setisLoading(true);
         setErrMessage(null);
 
-        API.get(`images/search?limit=100`)
+        API.get("images/search?limit=100")
             .then(res => {
                 console.log(res.data)
                 setCatArray(res.data);
@@ -91,12 +89,13 @@ function Main() {
                 setErrMessage(null);
             })
             .catch(err => {
-                //todo: handle err
+                setErrMessage("Error fetching cat images");
                 console.log(err)
                 setCatArray([]);
+                console.log(err)
                 setisLoading(false);
-                setErrMessage("Error fetching this cat image");
-            })
+                console.log(err)
+            });
     }
 
     const recursiveGetFaves = (pageCount = 0, cats = []) => {
@@ -120,9 +119,9 @@ function Main() {
                         setisLoading(false);
                         setErrMessage(null);
                     } else {
+                        setErrMessage("You don't have any favorites to display!");
                         setCatArray([]);
                         setisLoading(false);
-                        setErrMessage("You don't have any favorites to display!");
                     }
 
                     console.log(unshuffledArray)
@@ -130,13 +129,11 @@ function Main() {
                 }
             })
             .catch(err => {
-                //todo: handle err
-                console.log(err)
+                setErrMessage("Error fetching cat images");
                 setCatArray([]);
                 setisLoading(false);
-                setErrMessage("Error fetching this cat image");
                 return err;
-            })
+            });
     }
 
     const shuffleArray = array => {
@@ -178,10 +175,12 @@ function Main() {
 
     let catWrapper;
     if (isLoading) {
+        // if (true) {
+
         //todo: fix this css too
 
         catWrapper = <div
-            // className="loaderContainer"
+        // className="loaderContainer"
         >
             <FontAwesomeIcon
                 icon={faCircleNotch}
@@ -208,8 +207,8 @@ function Main() {
         const upperBound = isSingleCat ? 1 : numOfCats;
         let i;
         for (i = 0; i < upperBound; i++) {
-            //This makes it so that there are not more catContainers than there are cats
-            if (i >= catArray.length && isFaveCat) {
+            //This makes it so that there are not more catContainers than there are cats which would break the app
+            if (i >= catArray.length) {
                 break;
             }
             catColumns.push(
@@ -238,7 +237,7 @@ function Main() {
             onMouseEnter={() => setButtonBarIsHidden(false)}
             onMouseLeave={() => setButtonBarIsHidden(true)}
         >
-            <TransitionWrapper>
+            <VelocityTransitionGroup enter={{ animation: "slideDown" }} leave={{ animation: "slideUp" }}>
                 {buttonBarIsHidden ? null :
                     <ButtonBar
                         getFavesButton={getFavesButton}
@@ -249,7 +248,7 @@ function Main() {
                         imageSize={imageSize}
                     />
                 }
-            </TransitionWrapper>
+            </VelocityTransitionGroup>
             {catWrapper}
         </div>
     );
