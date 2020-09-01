@@ -141,7 +141,8 @@ function Main() {
     if (!catArray.length && !errMessage && !isLoading) {
         //todo: fix this css too
         catWrapper =
-            <div className="full-height justify-content-center d-flex align-items-center">
+            <div 
+            className="justify-content-center d-flex align-items-center">
                 <h1 className="text-center noFaves">
                     You don't have any favorites to display!
                     </h1>
@@ -187,7 +188,7 @@ function Main() {
             //     "width": "100%",
             // }}
             // className="full-height w-100 middle"
-            className="border-red"
+            className="border-red flexContainer"
             onMouseEnter={() => setButtonBarIsHidden(false)}
             onMouseLeave={() => setButtonBarIsHidden(true)}
         >

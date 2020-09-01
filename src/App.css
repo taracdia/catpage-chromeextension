@@ -4,15 +4,23 @@ body {
   background-attachment: fixed;
   background-color: teal;
   background-size: cover;
+  display: flex;
+  flex-direction: column;
 }
 
-html, body, #root {
+html, body, div.flexContainer, #root {
   height: 100%;
+  width: 100%;
 }
 
-.full-height {
-  min-height: 100%;
+.flexContainer {
+  display: flex;
+  flex-direction: column;
 }
+
+/* .full-height {
+  min-height: 100%;
+} */
 
 .border-red {
   border: 3px solid red;
