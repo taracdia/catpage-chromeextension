@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { faHeart as faHeartFilled } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartEmpty } from "@fortawesome/free-regular-svg-icons";
-import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Card, CardImg } from "reactstrap";
 import TransitionWrapper from "./TransitionWrapper";
@@ -57,24 +56,6 @@ function CatContainer(props) {
                 console.log(error)
             })
     }
-
-        if (props.errMessage) {
-            return (<div className="error">
-                {props.errMessage}
-            </div>)
-        } else if (!props.catObject) {
-            return (
-                <div
-                    className="loaderContainer"
-                >
-                    <FontAwesomeIcon
-                        icon={faCircleNotch}
-                        className="fa-spin loading"
-                    />
-                </div>
-            )
-        }
-
         return (
             <div
                 // style={{

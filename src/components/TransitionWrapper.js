@@ -12,7 +12,7 @@ const onEnteringonExit = node => {
     node.style.marginBottom = "";
 };
 
-export default class Group extends Component {
+class TransitionWrapper extends Component {
 
     state = {
         items: []
@@ -45,3 +45,5 @@ export default class Group extends Component {
         </TransitionGroup>;
     }
 }
+
+export default TransitionWrapper;
