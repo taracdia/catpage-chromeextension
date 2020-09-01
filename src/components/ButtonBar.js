@@ -15,7 +15,7 @@ class ButtonBar extends React.Component {
                                 <FormGroup check>
                                     <Label check>
                                         <Input type="checkbox"
-                                            checked={this.props.isSingleCat}
+                                            checked={(localStorage.getItem("isSingleCat") === "true")}
                                             onChange={this.props.handleChange}
                                             name="isSingleCat"
                                         />
@@ -23,10 +23,10 @@ class ButtonBar extends React.Component {
         </Label>
                                 </FormGroup>
                             </Col>
-                            <Col hidden={this.props.isSingleCat}>
+                            <Col hidden={(localStorage.getItem("isSingleCat") === "true")}>
                                 <FormGroup>
                                     <Label for="catsNumberInput">Number of Cats to Display</Label>
-                                    <Input type="number" name="numOfCats" min="1" max="100" value={this.props.numOfCats} onChange={this.props.handleChange} id="catsNumberInput" />
+                                    <Input type="number" name="numOfCats" min="1" max="100" value={localStorage.getItem("numOfCats")} onChange={this.props.handleChange} id="catsNumberInput" />
                                 </FormGroup>
                             </Col>
                             <Col
@@ -34,9 +34,9 @@ class ButtonBar extends React.Component {
                             >
                                 <button
                                     type="button"
-                                    className="btn btn-primary" onClick={this.props.getFaveCats}
+                                    className="btn btn-primary" onClick={this.props.getFavesButton}
                                 >
-                                    {(this.props.isSingleCat) ? "Get Fave" : "Get Faves"}
+                                    {(localStorage.getItem("isSingleCat") === "true") ? "Get Fave" : "Get Faves"}
                                 </button>
                             </Col>
                             <Col
@@ -45,16 +45,16 @@ class ButtonBar extends React.Component {
                                 <button
                                     type="button"
                                     className="btn btn-primary"
-                                    onClick={this.props.getRandomCats}
+                                    onClick={this.props.getRandomsButton}
                                 >
-                                    {(this.props.isSingleCat) ? "Get New Cat" : "Get New Cats"}
+                                    {(localStorage.getItem("isSingleCat") === "true") ? "Get New Cat" : "Get New Cats"}
                                 </button>
                             </Col>
-                            <Col hidden={this.props.isSingleCat}>
-                                <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={this.props.imageSize}
+                            <Col hidden={(localStorage.getItem("isSingleCat") === "true")}>
+                                <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={localStorage.getItem("imageSize")}
                                     onChange={this.props.handleChange} />
-                                    {/* remove showing the number */}
-        <Label for="imageSizeSlider">Image size {this.props.imageSize}</Label>
+                                    {/* todo: remove showing the number */}
+        <Label for="imageSizeSlider">Image size {localStorage.getItem("imageSize")}</Label>
                             </Col>
                         </Row>
                     </Form>
