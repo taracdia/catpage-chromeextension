@@ -4,55 +4,36 @@ body {
   background-attachment: fixed;
   background-color: teal;
   background-size: cover;
-  display: flex;
-  flex-direction: column;
 }
 
-html, body, div.flexContainer, #root {
+html, body, #root {
   height: 100%;
   width: 100%;
 }
-
-.flexContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-/* .full-height {
-  min-height: 100%;
-} */
 
 .border-red {
   border: 3px solid red;
   background-color: rgb(255, 255, 255, .2);
 }
 
-.border-blue {
-  border: 3px solid blue;
-  background-color: rgb(255, 255, 255, .2);
-}
 
-/* 
-.card.cat-card {
-  background-color: rgb(255, 255, 255, .2);
-  display: flex;
+.catContainer {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
 }
-
-.middle {
-  justify-content: center;
-  align-content: center;
-} */
 
 .faveButton {
   position: absolute;
   right: 0;
 }
 
-#buttonBar {
+.transparentBackground {
   background-color: rgb(179, 255, 255, .5);
 }
 
-.loaderContainer {
+.loadererrorContainer {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,26 +41,11 @@ html, body, div.flexContainer, #root {
 
 .loading {
   color: blue;
-  font-size: 28px;
+  font-size: 300px;
 }
 
 .errMessage {
   background-color: rgb(179, 255, 255, .5);
-}
-
-
-/* Transition CSS */
-.element-enter {
-  opacity: 0;
-}
-.element-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-in, margin 300ms ease-out;
-}
-.element-exit {
-  opacity: 1;
-}
-.element-exit-active {
-  opacity: 0;
-  transition: opacity 300ms ease-out, margin 300ms ease-in;
+  border-radius: 5px;
+  color: darkred;
 }

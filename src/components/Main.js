@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Container, Col } from "reactstrap";
+import { Row, Col } from "reactstrap";
 import CatContainer from "./CatContainer";
 import ButtonBar from "./ButtonBar";
 import API from "./API";
@@ -123,8 +123,6 @@ function Main() {
                         setCatArray([]);
                         setisLoading(false);
                     }
-
-                    console.log(unshuffledArray)
                     return unshuffledArray
                 }
             })
@@ -175,12 +173,9 @@ function Main() {
 
     let catWrapper;
     if (isLoading) {
-        // if (true) {
-
-        //todo: fix this css too
-
-        catWrapper = <div
-        // className="loaderContainer"
+        catWrapper = 
+        <div
+            className="loadererrorContainer h-100"
         >
             <FontAwesomeIcon
                 icon={faCircleNotch}
@@ -188,52 +183,53 @@ function Main() {
             />
         </div>
     } else if (errMessage) {
-        //todo: fix this css too
+        const errMessage = "error here"
         catWrapper =
-            <div className="full-height justify-content-center d-flex align-items-center">
+            <div className="loadererrorContainer h-100">
                 <h1 className="text-center errMessage">
                     {errMessage}
                 </h1>
             </div>
 
+    } else if (isSingleCat) {
+        catWrapper = 
+            <CatContainer
+                catObject={catArray[0]}
+                isSingleCat={isSingleCat}
+            />
     } else {
-        const catColumns = [];
+        const catCols = [];
         catWrapper =
-            <Container>
-                <Row
-                >{catColumns}
-                </Row>
-            </Container>
-        const upperBound = isSingleCat ? 1 : numOfCats;
+            <Row
+                className="m-0 px-4 flex-fill justify-content-center align-content-center"
+            >
+                {catCols}
+            </Row>
+        const upperBound = numOfCats;
         let i;
         for (i = 0; i < upperBound; i++) {
             //This makes it so that there are not more catContainers than there are cats which would break the app
             if (i >= catArray.length) {
                 break;
             }
-            catColumns.push(
+            catCols.push(
                 <Col
-                    xs={isSingleCat ? 12 : imageSize}
-                    className="m-0 p-0 "
+                    xs={imageSize}
                     key={i}
+                    className="p-2"
                 >
                     <CatContainer
                         catObject={catArray[i]}
-                        isLoading={isLoading}
-                        errMessage={errMessage}
+                        isSingleCat={isSingleCat}
                     />
                 </Col>
             );
         }
     }
+
     return (
         <div
-            // style={{
-            //     "min-height": "100%",
-            //     "width": "100%",
-            // }}
-            // className="full-height w-100 middle"
-            className="border-red"
+            className="m-0 p-0 w-100 h-100 d-flex flex-column"
             onMouseEnter={() => setButtonBarIsHidden(false)}
             onMouseLeave={() => setButtonBarIsHidden(true)}
         >
@@ -247,12 +243,14 @@ function Main() {
                         numOfCats={numOfCats}
                         imageSize={imageSize}
                     />
-                }
+}
             </VelocityTransitionGroup>
+
             {catWrapper}
         </div>
     );
 }
+
 
 export default Main;
 
