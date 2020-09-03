@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Row, Col } from "reactstrap";
 import CatContainer from "./CatContainer";
 import ButtonBar from "./ButtonBar";
@@ -7,98 +7,81 @@ import askForPermission from "./askForPermission";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VelocityTransitionGroup } from "velocity-react";
+import { render } from "@testing-library/react";
 
-function Main() {
-    //Variables controlled by buttons and saved in local storage
-    const [isSingleCat, setIsSingleCat] = useLocalStorage("isSingleCat", true);
-    const [isFaveCat, setIsFaveCat] = useLocalStorage("isFaveCat", true);
-    const [numOfCats, setNumOfCats] = useLocalStorage("numOfCats", 15);
-    const [imageSize, setImageSize] = useLocalStorage("imageSize", 4);
-    //State variables
-    const [buttonBarIsHidden, setButtonBarIsHidden] = useState(true);
-    const [catArray, setCatArray] = useState([]);
-    const [isLoading, setisLoading] = useState(true);
-    const [errMessage, setErrMessage] = useState(null);
 
-    function useLocalStorage(key, defaultValue) {
-        const [storedValue, setStoredValue] = useState(() => {
-            if (localStorage.getItem(key)) {
-                //Handles parsing
-                if (localStorage.getItem(key) === "true") {
-                    return true
-                } else if (localStorage.getItem(key) === "false") {
-                    return false;
-                } else {
-                    //In this app, the only options are booleans or integers so this handles the integer case
-                    return + localStorage.getItem(key)
-                }
-            } else {
-                return defaultValue;
-            }
-        });
+class Main extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isSingleCat: localStorage.getItem("isSingleCat") === "true",
+            isFaveCat: localStorage.getItem("isFaveCat") === "true",
+            numOfCats: localStorage.getItem("numOfCats")
+                ? +localStorage.getItem("numOfCats")
+                : 15,
+            imageSize: localStorage.getItem("imageSize")
+                ? +localStorage.getItem("imageSize")
+                : 4,
 
-        const setValue = value => {
-            // Handle case where value is a function
-            const valueToStore = value instanceof Function ? value(storedValue) : value;
-            // Save state
-            setStoredValue(valueToStore);
-            // Save to local storage
-            localStorage.setItem(key, valueToStore);
-
-        };
-
-        return [storedValue, setValue];
+            buttonBarIsHidden: true,
+            catArray: [],
+            isLoading: true,
+            errMessage: null
+        }
     }
 
-    function handleChange(event) {
+    setButtonBarIsHidden = val => {
+        this.setState({
+            buttonBarIsHidden: val
+        })
+    }
+
+    handleChange = (event) => {
         const input = event.target;
         const value = input.type === "checkbox" ? input.checked : input.value;
         const name = input.name;
 
-        if (name === "isSingleCat") {
-            setIsSingleCat(value);
-        } else if (name === "isFaveCat") {
-            setIsFaveCat(value);
-        } else if (name === "numOfCats") {
-            setNumOfCats(value);
-        } else if (name === "imageSize") {
-            setImageSize(value);
-        }
+        this.locallyStoreAndSet(name, value)
     }
 
-    function getRandomsButton() {
-        window.location.reload(false);
-        getRandoms();
-    }
-    const getFavesButton = () => {
-        window.location.reload(false);
-        getFaves();
+    locallyStoreAndSet = (name, value) => {
+        this.setState({
+            [name]: value
+        })
+
+        localStorage.setItem(name, value)
     }
 
-    const getRandoms = () => {
-        setIsFaveCat(false);
-        setCatArray([]);
-        setisLoading(true);
-        setErrMessage(null);
+    //The reloads and separate functions for getRandomsButton vs getRandoms is so that when the user switches between getting randoms and getting faves the UI displays the correct heart
+    getRandomsButton = () => {
+        window.location.reload(false);
+        this.locallyStoreAndSet("isFaveCat", true);
+        this.getRandoms();
+    }
+    getFavesButton = () => {
+        window.location.reload(false);
+        this.locallyStoreAndSet("isFaveCat", false);
+        this.getFaves();
+    }
+
+    getRandoms = () => {
+        this.locallyStoreAndSet("catArray", []);
+        this.locallyStoreAndSet("isLoading", true);
+        this.locallyStoreAndSet("errMessage", null);
 
         API.get("images/search?limit=100")
             .then(res => {
-                console.log(res.data)
-                setCatArray(res.data);
-                setisLoading(false);
-                setErrMessage(null);
+                this.locallyStoreAndSet("catArray", res.data);
+                this.locallyStoreAndSet("isLoading", false);
+                this.locallyStoreAndSet("errMessage", null);
             })
             .catch(err => {
-                setErrMessage("Error fetching cat images");
-                console.log(err)
-                setCatArray([]);
-                console.log(err)
-                setisLoading(false);
-                console.log(err)
+                this.locallyStoreAndSet("catArray", []);
+                this.locallyStoreAndSet("isLoading", false);
+                this.locallyStoreAndSet("errMessage", "Error fetching cat images");
             });
     }
-
-    const recursiveGetFaves = (pageCount = 0, cats = []) => {
+    recursiveGetFaves = (pageCount = 0, cats = []) => {
         API.get(`favourites`, {
             "params": {
                 "page": pageCount,
@@ -107,7 +90,7 @@ function Main() {
         })
             .then(res => {
                 if (res && res.data && res.data.length) {
-                    recursiveGetFaves(pageCount + 1, cats.concat(res.data))
+                    this.recursiveGetFaves(pageCount + 1, cats.concat(res.data))
                 } else {
                     const unshuffledArray = cats.map((item) => {
                         const temp = item["image"];
@@ -115,27 +98,45 @@ function Main() {
                         return temp;
                     });
                     if (unshuffledArray && unshuffledArray.length) {
-                        setCatArray(shuffleArray(unshuffledArray.slice()));
-                        setisLoading(false);
-                        setErrMessage(null);
+                        this.locallyStoreAndSet("catArray", this.shuffleArray(unshuffledArray.slice()));
+                        this.locallyStoreAndSet("isLoading", false);
+                        this.locallyStoreAndSet("errMessage", null);
+
                     } else {
-                        setErrMessage("You don't have any favorites to display!");
-                        setCatArray([]);
-                        setisLoading(false);
+                        this.locallyStoreAndSet("errMessage", "You don't have any favorites to display!");
+                        this.locallyStoreAndSet("catArray", []);
+                        this.locallyStoreAndSet("isLoading", false);
                     }
                     return unshuffledArray
                 }
             })
             .catch(err => {
-                setErrMessage("Error fetching cat images");
-                setCatArray([]);
-                setisLoading(false);
+                this.locallyStoreAndSet("errMessage", "Error fetching cat images");
+                this.locallyStoreAndSet("catArray", []);
+                this.locallyStoreAndSet("isLoading", false);
+
                 return err;
             });
     }
 
-    const shuffleArray = array => {
-        //This shuffles an array and only sends back one that is the size of 100 or the original array, whichever is smaller
+    //The requests are offloaded to a separate recursive function because the responses are in chunks of 100 so if a user has more than 100 favorites they need separate "pages" of results
+    getFaves = () => {
+        if (!localStorage.getItem("userID") && !askForPermission()) {
+            console.log("no userID")
+            return;
+        }
+
+        this.locallyStoreAndSet("isLoading", true);
+        this.locallyStoreAndSet("errMessage", null);
+        this.locallyStoreAndSet("catArray", []);
+
+
+        this.recursiveGetFaves();
+    }
+
+
+    shuffleArray = array => {
+        //This shuffles an array and only sends back one that is the size of 100 or the original array, whichever is smaller. This is so that the user can see all their favorites and not just the earliest stored ones
         const newArray = [];
         if (!array.length) return newArray;
 
@@ -149,107 +150,110 @@ function Main() {
         return newArray;
     }
 
-    const getFaves = () => {
-        if (!localStorage.getItem("userID") && !askForPermission()) {
-            console.log("no userID")
-            return;
-        }
-        setIsFaveCat(true);
-
-        setCatArray([]);
-        setisLoading(true);
-        setErrMessage(null);
-
-        recursiveGetFaves();
-    }
-
-    useEffect(() => {
-        if (isFaveCat) {
-            getFaves();
+    componentDidMount = () => {
+        if (this.state.isFaveCat) {
+            this.getFaves();
         } else {
-            getRandoms();
-        }
-    }, [])
-
-    let catWrapper;
-    if (isLoading) {
-        catWrapper = 
-        <div
-            className="loadererrorContainer h-100"
-        >
-            <FontAwesomeIcon
-                icon={faCircleNotch}
-                className="fa-spin loading"
-            />
-        </div>
-    } else if (errMessage) {
-        const errMessage = "error here"
-        catWrapper =
-            <div className="loadererrorContainer h-100">
-                <h1 className="text-center errMessage">
-                    {errMessage}
-                </h1>
-            </div>
-
-    } else if (isSingleCat) {
-        catWrapper = 
-            <CatContainer
-                catObject={catArray[0]}
-                isSingleCat={isSingleCat}
-            />
-    } else {
-        const catCols = [];
-        catWrapper =
-            <Row
-                className="m-0 px-4 flex-fill justify-content-center align-content-center"
-            >
-                {catCols}
-            </Row>
-        const upperBound = numOfCats;
-        let i;
-        for (i = 0; i < upperBound; i++) {
-            //This makes it so that there are not more catContainers than there are cats which would break the app
-            if (i >= catArray.length) {
-                break;
-            }
-            catCols.push(
-                <Col
-                    xs={imageSize}
-                    key={i}
-                    className="p-2"
-                >
-                    <CatContainer
-                        catObject={catArray[i]}
-                        isSingleCat={isSingleCat}
-                    />
-                </Col>
-            );
+            this.getRandoms();
         }
     }
 
-    return (
-        <div
-            className="m-0 p-0 w-100 h-100 d-flex flex-column"
-            onMouseEnter={() => setButtonBarIsHidden(false)}
-            onMouseLeave={() => setButtonBarIsHidden(true)}
-        >
-            <VelocityTransitionGroup enter={{ animation: "slideDown" }} leave={{ animation: "slideUp" }}>
-                {buttonBarIsHidden ? null :
-                    <ButtonBar
-                        getFavesButton={getFavesButton}
-                        getRandomsButton={getRandomsButton}
-                        handleChange={handleChange}
-                        isSingleCat={isSingleCat}
-                        numOfCats={numOfCats}
-                        imageSize={imageSize}
+    //Beginning of rendering
+    render() {
+        let contentWrapper;
+        if (this.state.isLoading) {
+            contentWrapper =
+                <div className="loadererrorContainer h-100">
+                    <FontAwesomeIcon
+                        icon={faCircleNotch}
+                        className="fa-spin loading"
                     />
-}
-            </VelocityTransitionGroup>
+                </div>
+        } else if (this.state.errMessage) {
+            const errMessage = "error here"
+            contentWrapper =
+                <div className="loadererrorContainer h-100">
+                    <h1 className="text-center errMessage">
+                        {errMessage}
+                    </h1>
+                </div>
 
-            {catWrapper}
-        </div>
-    );
+        } else if (this.state.isSingleCat) {
+            contentWrapper =
+                <CatContainer
+                    catObject={this.state.catArray[0]}
+                    isSingleCat={this.state.isSingleCat}
+                />
+        } else {
+            const catCols = [];
+            contentWrapper =
+                <Row
+                    className="m-0 px-4 flex-fill justify-content-center align-content-center"
+                >
+                    {catCols}
+                </Row>
+            const upperBound = this.state.numOfCats;
+            let i;
+            for (i = 0; i < upperBound; i++) {
+                //This makes it so that there are not more catContainers than there are cats which would break the app
+                if (i >= this.state.catArray.length) {
+                    break;
+                }
+                catCols.push(
+                    <Col
+                        xs={this.state.imageSize}
+                        key={i}
+                        className="p-2"
+                    >
+                        <CatContainer
+                            catObject={this.state.catArray[i]}
+                            isSingleCat={this.state.isSingleCat}
+                        />
+                    </Col>
+                );
+            }
+        }
+
+        return (
+            //Div was used instead of Container so that there was no need to override the built in width
+            <div
+                className="m-0 p-0 w-100 h-100 d-flex flex-column"
+                onMouseEnter={() => this.setState({ buttonBarIsHidden: false })}
+                onMouseLeave={() => this.setState({ buttonBarIsHidden: true })}
+            >
+                <VelocityTransitionGroup enter={{ animation: "slideDown" }} leave={{ animation: "slideUp" }}>
+                    {this.state.buttonBarIsHidden ? null :
+                        <ButtonBar
+                            getFavesButton={this.getFavesButton}
+                            getRandomsButton={this.getRandomsButton}
+                            handleChange={this.handleChange}
+                            isSingleCat={this.state.isSingleCat}
+                            numOfCats={this.state.numOfCats}
+                            imageSize={this.state.imageSize}
+                        />
+                    }
+                </VelocityTransitionGroup>
+
+                {contentWrapper}
+            </div>
+        );
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export default Main;

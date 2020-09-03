@@ -53,8 +53,7 @@ class ButtonBar extends React.Component {
                     <Col hidden={this.props.isSingleCat}>
                         <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={this.props.imageSize}
                             onChange={this.props.handleChange} />
-                        {/* todo: remove showing the number */}
-                        <Label for="imageSizeSlider">Image size {this.props.imageSize}</Label>
+                        <Label for="imageSizeSlider">Image size</Label>
                     </Col>
                 </Row>
             </Form>

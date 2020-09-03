@@ -38,11 +38,9 @@ function CatContainer(props) {
 
     const deleteFave = () => {
         API.delete(`favourites/${props.catObject.faveID}`)
-            .then(res => {
-                if (res.ok) {
+            .then(() => {
                     delete props.catObject.faveID;
                     setIsFave(false);
-                }
             })
             .catch(() => {
                 setErrMessage("Error deleting favorite")
@@ -98,8 +96,6 @@ function CatContainer(props) {
             </div>
         )
     }
-    //todo: delete unused imports
-
 
     return (
         //Styles are to make the catContainer be a perfect square for aesthetic purposes
