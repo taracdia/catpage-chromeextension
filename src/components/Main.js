@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React from "react";
 import { Row, Col } from "reactstrap";
 import CatContainer from "./CatContainer";
 import ButtonBar from "./ButtonBar";
@@ -7,14 +7,15 @@ import askForPermission from "./askForPermission";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VelocityTransitionGroup } from "velocity-react";
-import { render } from "@testing-library/react";
 
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isSingleCat: localStorage.getItem("isSingleCat") === "true",
+            isSingleCat: localStorage.getItem("isSingleCat") 
+            ? localStorage.getItem("isSingleCat") === "true" 
+            : true,
             isFaveCat: localStorage.getItem("isFaveCat") === "true",
             numOfCats: localStorage.getItem("numOfCats")
                 ? +localStorage.getItem("numOfCats")
@@ -30,11 +31,7 @@ class Main extends React.Component {
         }
     }
 
-    setButtonBarIsHidden = val => {
-        this.setState({
-            buttonBarIsHidden: val
-        })
-    }
+    setButtonBarIsHidden = val => this.setState({ buttonBarIsHidden: val })
 
     handleChange = (event) => {
         const input = event.target;
@@ -45,26 +42,13 @@ class Main extends React.Component {
     }
 
     locallyStoreAndSet = (name, value) => {
-        this.setState({
-            [name]: value
-        })
-
+        this.setState({ [name]: value })
         localStorage.setItem(name, value)
     }
 
-    //The reloads and separate functions for getRandomsButton vs getRandoms is so that when the user switches between getting randoms and getting faves the UI displays the correct heart
-    getRandomsButton = () => {
-        window.location.reload(false);
-        this.locallyStoreAndSet("isFaveCat", true);
-        this.getRandoms();
-    }
-    getFavesButton = () => {
-        window.location.reload(false);
-        this.locallyStoreAndSet("isFaveCat", false);
-        this.getFaves();
-    }
-
     getRandoms = () => {
+        this.locallyStoreAndSet("isFaveCat", false);
+
         this.locallyStoreAndSet("catArray", []);
         this.locallyStoreAndSet("isLoading", true);
         this.locallyStoreAndSet("errMessage", null);
@@ -75,63 +59,63 @@ class Main extends React.Component {
                 this.locallyStoreAndSet("isLoading", false);
                 this.locallyStoreAndSet("errMessage", null);
             })
-            .catch(err => {
+            .catch(() => {
                 this.locallyStoreAndSet("catArray", []);
                 this.locallyStoreAndSet("isLoading", false);
                 this.locallyStoreAndSet("errMessage", "Error fetching cat images");
-            });
-    }
-    recursiveGetFaves = (pageCount = 0, cats = []) => {
-        API.get(`favourites`, {
-            "params": {
-                "page": pageCount,
-                "sub_id": localStorage.getItem("userID")
-            }
-        })
-            .then(res => {
-                if (res && res.data && res.data.length) {
-                    this.recursiveGetFaves(pageCount + 1, cats.concat(res.data))
-                } else {
-                    const unshuffledArray = cats.map((item) => {
-                        const temp = item["image"];
-                        temp["faveID"] = item.id;
-                        return temp;
-                    });
-                    if (unshuffledArray && unshuffledArray.length) {
-                        this.locallyStoreAndSet("catArray", this.shuffleArray(unshuffledArray.slice()));
-                        this.locallyStoreAndSet("isLoading", false);
-                        this.locallyStoreAndSet("errMessage", null);
-
-                    } else {
-                        this.locallyStoreAndSet("errMessage", "You don't have any favorites to display!");
-                        this.locallyStoreAndSet("catArray", []);
-                        this.locallyStoreAndSet("isLoading", false);
-                    }
-                    return unshuffledArray
-                }
-            })
-            .catch(err => {
-                this.locallyStoreAndSet("errMessage", "Error fetching cat images");
-                this.locallyStoreAndSet("catArray", []);
-                this.locallyStoreAndSet("isLoading", false);
-
-                return err;
             });
     }
 
     //The requests are offloaded to a separate recursive function because the responses are in chunks of 100 so if a user has more than 100 favorites they need separate "pages" of results
     getFaves = () => {
-        if (!localStorage.getItem("userID") && !askForPermission()) {
-            console.log("no userID")
-            return;
-        }
+        if (!localStorage.getItem("userID") && !askForPermission()) return;
+
+        this.locallyStoreAndSet("isFaveCat", true);
 
         this.locallyStoreAndSet("isLoading", true);
         this.locallyStoreAndSet("errMessage", null);
         this.locallyStoreAndSet("catArray", []);
 
+        try {
+            let unshuffledArray = [];
+            let promises = [];
+            const upperBound = Math.ceil(localStorage.getItem("numOfFaves") / 100);
+            let i;
+            for (i = 0; i <= upperBound; i++) {
+                promises.push(
+                    API.get(`favourites`, {
+                        "params": {
+                            "page": i,
+                            "sub_id": localStorage.getItem("userID")
+                        }
+                    }).then(response => {
+                        unshuffledArray.push(...response.data)
+                    })
+                )
+            }
 
-        this.recursiveGetFaves();
+            Promise.all(promises).then(() => {
+                if (unshuffledArray && unshuffledArray.length) {
+                    const formattedArray = unshuffledArray.map((item) => {
+                        const temp = item["image"];
+                        temp["faveID"] = item.id;
+                        return temp;
+                    });
+                    this.locallyStoreAndSet("catArray", this.shuffleArray(formattedArray));
+                    this.locallyStoreAndSet("isLoading", false);
+                    this.locallyStoreAndSet("errMessage", null);
+
+                } else {
+                    this.locallyStoreAndSet("errMessage", "You don't have any favorites to display!");
+                    this.locallyStoreAndSet("catArray", []);
+                    this.locallyStoreAndSet("isLoading", false);
+                }
+            });
+        } catch {
+            this.locallyStoreAndSet("errMessage", "Error fetching cat images");
+            this.locallyStoreAndSet("catArray", []);
+            this.locallyStoreAndSet("isLoading", false);
+        }
     }
 
 
@@ -140,9 +124,9 @@ class Main extends React.Component {
         const newArray = [];
         if (!array.length) return newArray;
 
-        const upperBound = (array.length > 100) ? 99 : array.length - 1;
+        const upperBound = (array.length > 100) ? 100 : array.length;
         let randomIndex;
-        for (let i = upperBound; i >= 0; i--) {
+        for (let i = 0; i < upperBound; i++) {
             randomIndex = Math.floor(Math.random() * array.length);
             newArray.push(array[randomIndex])
             array.splice(randomIndex, 1);
@@ -158,7 +142,6 @@ class Main extends React.Component {
         }
     }
 
-    //Beginning of rendering
     render() {
         let contentWrapper;
         if (this.state.isLoading) {
@@ -170,11 +153,10 @@ class Main extends React.Component {
                     />
                 </div>
         } else if (this.state.errMessage) {
-            const errMessage = "error here"
             contentWrapper =
                 <div className="loadererrorContainer h-100">
                     <h1 className="text-center errMessage">
-                        {errMessage}
+                        {this.state.errMessage}
                     </h1>
                 </div>
 
@@ -183,6 +165,7 @@ class Main extends React.Component {
                 <CatContainer
                     catObject={this.state.catArray[0]}
                     isSingleCat={this.state.isSingleCat}
+                    isFaveCat={this.state.isFaveCat}
                 />
         } else {
             const catCols = [];
@@ -208,6 +191,8 @@ class Main extends React.Component {
                         <CatContainer
                             catObject={this.state.catArray[i]}
                             isSingleCat={this.state.isSingleCat}
+                            isFaveCat={this.state.isFaveCat}
+
                         />
                     </Col>
                 );
@@ -224,8 +209,8 @@ class Main extends React.Component {
                 <VelocityTransitionGroup enter={{ animation: "slideDown" }} leave={{ animation: "slideUp" }}>
                     {this.state.buttonBarIsHidden ? null :
                         <ButtonBar
-                            getFavesButton={this.getFavesButton}
-                            getRandomsButton={this.getRandomsButton}
+                            getFaves={this.getFaves}
+                            getRandoms={this.getRandoms}
                             handleChange={this.handleChange}
                             isSingleCat={this.state.isSingleCat}
                             numOfCats={this.state.numOfCats}

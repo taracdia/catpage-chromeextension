@@ -1,9 +1,7 @@
 import React from "react";
 import { Row, Col, Form, Label, Input, FormGroup } from "reactstrap";
 
-class ButtonBar extends React.Component {
-
-    render() {
+function ButtonBar(props) {
         return (
             <Form
                 className="text-center align-items-center transparentBackground"
@@ -15,18 +13,23 @@ class ButtonBar extends React.Component {
                         <FormGroup check>
                             <Label check>
                                 <Input type="checkbox"
-                                    checked={this.props.isSingleCat}
-                                    onChange={this.props.handleChange}
+                                    checked={props.isSingleCat}
+                                    onChange={props.handleChange}
                                     name="isSingleCat"
                                 />
           Only One Cat Displayed
         </Label>
                         </FormGroup>
                     </Col>
-                    <Col hidden={this.props.isSingleCat}>
+                    <Col hidden={props.isSingleCat}>
                         <FormGroup>
-                            <Label for="catsNumberInput">Number of Cats to Display</Label>
-                            <Input type="number" name="numOfCats" min="1" max="100" value={this.props.numOfCats} onChange={this.props.handleChange} id="catsNumberInput" />
+                            <Label for="catsNumberInput">
+                                Number of Cats to Display
+                                </Label>
+                            <Input type="number" name="numOfCats" min="1"
+                                max="100" value={props.numOfCats}
+                                onChange={props.handleChange}
+                                id="catsNumberInput" />
                         </FormGroup>
                     </Col>
                     <Col
@@ -34,9 +37,10 @@ class ButtonBar extends React.Component {
                     >
                         <button
                             type="button"
-                            className="btn btn-primary" onClick={this.props.getFavesButton}
+                            className="btn btn-primary"
+                            onClick={props.getFaves}
                         >
-                            {this.props.isSingleCat ? "Get Fave" : "Get Faves"}
+                            {props.isSingleCat ? "Get Fave" : "Get Faves"}
                         </button>
                     </Col>
                     <Col
@@ -45,21 +49,23 @@ class ButtonBar extends React.Component {
                         <button
                             type="button"
                             className="btn btn-primary"
-                            onClick={this.props.getRandomsButton}
+                            onClick={props.getRandoms}
                         >
-                            {this.props.isSingleCat ? "Get New Cat" : "Get New Cats"}
+                            {props.isSingleCat
+                                ? "Get New Cat" : "Get New Cats"}
                         </button>
                     </Col>
-                    <Col hidden={this.props.isSingleCat}>
-                        <Input type="range" name="imageSize" id="imageSizeSlider" min="1" max="12" value={this.props.imageSize}
-                            onChange={this.props.handleChange} />
+                    <Col hidden={props.isSingleCat}>
+                        <Input type="range" name="imageSize" id="imageSizeSlider"
+                            min="1" max="12" value={props.imageSize}
+                            onChange={props.handleChange} />
                         <Label for="imageSizeSlider">Image size</Label>
                     </Col>
                 </Row>
             </Form>
 
         );
-    }
+    
 }
 
 export default ButtonBar;
