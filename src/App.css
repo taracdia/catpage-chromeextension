@@ -11,12 +11,6 @@ html, body, #root {
   width: 100%;
 }
 
-.border-red {
-  border: 3px solid red;
-  background-color: rgb(255, 255, 255, .2);
-}
-
-
 .catContainer {
   background-size: contain;
   background-position: center;
