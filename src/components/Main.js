@@ -315,7 +315,7 @@ class Main extends React.Component {
                 <VelocityTransitionGroup
                     enter={{ animation: "slideDown" }}
                     leave={{ animation: "slideUp" }}>
-                    {/* {this.state.buttonBarIsHidden ? null : */}
+                    {this.state.buttonBarIsHidden ? null :
                         <ButtonBar
                             getFaves={this.getFaves}
                             getRandoms={this.getRandoms}
@@ -325,7 +325,7 @@ class Main extends React.Component {
                             numOfCats={this.state.numOfCats}
                             imageSize={this.state.imageSize}
                         />
-                    {/* } */}
+                    }
                 </VelocityTransitionGroup>
                 {contentWrapper}
             </div>
