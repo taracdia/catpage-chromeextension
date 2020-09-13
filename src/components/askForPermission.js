@@ -1,6 +1,9 @@
 /* global chrome */
 export default function askForPermission() {
-    chrome.permissions.request({ permissions: ["identity.email"] }
+    chrome.permissions.request({ permissions: [
+        "identity",
+        "identity.email"
+    ] }
         , (granted) => {
             // The callback argument will be true if the user granted the permissions
             if (granted) {

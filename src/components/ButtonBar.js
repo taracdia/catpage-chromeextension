@@ -9,9 +9,12 @@ function ButtonBar(props) {
             transparentBackground"
         >
             <Row form
-                className="align-items-center m-auto w-75"
+                className="align-items-center 
+                justify-content-center m-auto w-75"
             >
-                <Col>
+                <Col
+                    xs="3"
+                >
                     <FormGroup check>
                         <Label check>
                             <Input
@@ -21,8 +24,8 @@ function ButtonBar(props) {
                                 {props.handleChange}
                                 name="isSingleCat"
                             />
-          Only One Cat Displayed
-        </Label>
+                            Only One Cat Displayed
+                        </Label>
                     </FormGroup>
                 </Col>
                 <Col hidden={props.isSingleCat}>

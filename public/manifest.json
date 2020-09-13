@@ -18,11 +18,11 @@
     "newtab": "index.html"
   },
   "permissions": [ 
-    "activeTab",
-    "identity",
-    "storage"
+    "activeTab"
   ],
-  "optional_permissions": [ 
+  "optional_permissions": [
+    "storage", 
+    "identity",
     "identity.email"
   ]
 }

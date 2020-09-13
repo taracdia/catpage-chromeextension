@@ -152,8 +152,19 @@ class Main extends React.Component {
             }
 
             Promise.all(promises).then(() => {
-                if (responseArray &&
-                    responseArray.length) {
+                if (!responseArray) {
+                    throw new Error();
+                }
+                /*
+                    This is in case the numOfFaves variable 
+                    becomes incorrect, it will be corrected 
+                    every time the user requests their 
+                    favorites.
+                */
+                localStorage.setItem("numOfFaves",
+                    responseArray.length);
+
+                if (responseArray.length) {
                     const formattedArray =
                         responseArray.map((item) => {
                             const temp = item["image"];
@@ -304,7 +315,7 @@ class Main extends React.Component {
                 <VelocityTransitionGroup
                     enter={{ animation: "slideDown" }}
                     leave={{ animation: "slideUp" }}>
-                    {this.state.buttonBarIsHidden ? null :
+                    {/* {this.state.buttonBarIsHidden ? null : */}
                         <ButtonBar
                             getFaves={this.getFaves}
                             getRandoms={this.getRandoms}
@@ -314,7 +325,7 @@ class Main extends React.Component {
                             numOfCats={this.state.numOfCats}
                             imageSize={this.state.imageSize}
                         />
-                    }
+                    {/* } */}
                 </VelocityTransitionGroup>
                 {contentWrapper}
             </div>
