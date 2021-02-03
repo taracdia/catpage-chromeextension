@@ -9,7 +9,7 @@
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@testing-library/jest-dom": "5.11.4",
     "@testing-library/react": "11.0.2",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.2",
     "immer": "8.0.1",
     "node-forge": "0.10.0",
