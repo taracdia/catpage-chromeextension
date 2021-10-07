@@ -21,7 +21,6 @@
     "activeTab"
   ],
   "optional_permissions": [
-    "storage", 
     "identity",
     "identity.email"
   ]
